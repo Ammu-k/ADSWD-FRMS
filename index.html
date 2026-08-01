@@ -233,8 +233,8 @@ tr:hover{background:rgba(13,148,136,.03)}
 /* PRINT */
 @media print{
     @page{
-        size: A4 portrait;
-        margin: 10mm;
+    size: A4 landscape;
+    margin: 5mm;
     }
     .sidebar,
     .topbar,
@@ -260,10 +260,26 @@ tr:hover{background:rgba(13,148,136,.03)}
         display:block!important;
     }
     .report-container{
-        border:none!important;
-        box-shadow:none!important;
-        width:100%!important;
-        max-width:none!important;
+    border:none!important;
+    box-shadow:none!important;
+    width:100%!important;
+    max-width:none!important;
+    overflow:visible!important;
+    max-height:none!important;
+    height:auto!important;
+    }
+    .report-body .report-section{
+    overflow:visible!important;
+}
+
+    .report-body{
+    overflow:visible!important;
+    }
+    table{
+    width:100%!important;
+    }
+    tr{
+    page-break-inside:avoid;
     }
 }
 
@@ -2380,16 +2396,55 @@ function printReport(){
 }
 window.printReport = printReport;
 
-function exportReportPDF(){
+async function exportReportPDF(){
     generateReport();
-    const el = document.getElementById('reportContainer');
-    if(!el || !el.innerHTML.trim()){
+    const report = document.getElementById("reportContainer");
+    if(!report || !report.innerHTML.trim()){
         toast(t('no_report_to_export'),'error');
         return;
     }
-    setTimeout(() => {
-        window.print();
-    }, 100);
+    // Save original styles
+    const oldOverflow = report.style.overflow;
+    const oldHeight = report.style.height;
+    const oldMaxHeight = report.style.maxHeight;
+    // Expand report fully
+    report.style.overflow = "visible";
+    report.style.height = "auto";
+    report.style.maxHeight = "none";
+    await new Promise(resolve => setTimeout(resolve,300));
+    const canvas = await html2canvas(report,{
+        scale:2,
+        useCORS:true,
+        backgroundColor:"#ffffff",
+        scrollX:0,
+        scrollY:-window.scrollY
+    });
+    // Restore styles
+    report.style.overflow = oldOverflow;
+    report.style.height = oldHeight;
+    report.style.maxHeight = oldMaxHeight;
+    const imgData = canvas.toDataURL("image/png");
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+        orientation:"landscape",
+        unit:"mm",
+        format:"a4"
+    });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const imgWidth = pageWidth;
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 0;
+    pdf.addImage(imgData,"PNG",0,position,imgWidth,imgHeight);
+    heightLeft -= pageHeight;
+    while(heightLeft > 0){
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData,"PNG",0,position,imgWidth,imgHeight);
+        heightLeft -= pageHeight;
+    }
+    pdf.save("ADSWD_Report.pdf");
 }
 window.exportReportPDF = exportReportPDF;
 
@@ -2656,5 +2711,7 @@ window.closeEditModal = closeEditModal;
 init();
 </script>
 <script type="module" src="firebase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body>
 </html>
