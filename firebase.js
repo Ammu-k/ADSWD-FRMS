@@ -6,7 +6,9 @@ import {
     getDocs,
     doc,
     updateDoc,
-    deleteDoc
+    deleteDoc,
+    getDoc,
+    setDoc
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 import {
@@ -40,7 +42,9 @@ export {
     getDocs,
     doc,
     updateDoc,
-    deleteDoc
+    deleteDoc,
+    getDoc,
+    setDoc
 };
 
 export const auth = getAuth(app);
