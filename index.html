@@ -2664,10 +2664,14 @@ function buildReportPrintLayout(){
 
     const container=document.createElement('div');
     container.className='print-report-layout';
-    container.style.position='fixed';
-    container.style.left='-9999px';
-    container.style.top='0';
-    container.style.zIndex='-1';
+    container.style.position = "fixed";
+    container.style.left = "0";
+    container.style.top = "0";
+    container.style.visibility = "hidden";
+    container.style.pointerEvents = "none";
+    container.style.zIndex = "-1";
+    container.style.width = "1123px";   // A4 landscape
+    container.style.background = "#fff";
     container.innerHTML=`<div class="print-report-page">
         <div class="print-head">
             <div style="display:flex;align-items:center;gap:12px">
@@ -2721,9 +2725,13 @@ window.printReport = printReport;
 async function exportReportPDF() {
     const layout = buildReportPrintLayout();
     document.body.appendChild(layout);
+    const page = layout.querySelector(".print-report-page");
+
+    console.log("Layout:", layout.getBoundingClientRect());
+    console.log("Page:", page.getBoundingClientRect());
     try {
-        await new Promise(r => setTimeout(r, 500));
-        const canvas = await html2canvas(layout, {
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        const canvas = await html2canvas(page, {
             scale: 2,
             useCORS: true,
             backgroundColor: "#ffffff",
