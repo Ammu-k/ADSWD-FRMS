@@ -2713,6 +2713,7 @@ function buildReportPrintLayout(){
             <div class="signature">${esc(t('verified_by'))} ${esc(verifiedBy||'________________')}</div>
         </div>
     </div>`;
+    console.log(container.innerHTML);
     return container;
 }
 
@@ -2734,6 +2735,10 @@ async function exportReportPDF() {
     console.log("Page:", page.getBoundingClientRect());
     try {
         await new Promise(resolve => requestAnimationFrame(resolve));
+        const page = layout.querySelector(".print-report-page");
+        page.style.visibility = "visible";
+        page.style.display = "block";
+        console.log("HTML:", page.innerHTML);
         const canvas = await html2canvas(page, {
             scale: 2,
             useCORS: true,
