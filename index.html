@@ -297,10 +297,9 @@ tr:hover{background:rgba(13,148,136,.03)}
 }
 
 .print-report-layout{
-    position:fixed;
-    left:-99999px;
-    top:0;
-    visibility:hidden;
+    position: fixed;
+    left: -10000px;
+    top: 0;
 }
 .print-report-page{
     width:277mm;
@@ -2731,7 +2730,6 @@ async function exportReportPDF() {
     const layout = buildReportPrintLayout();
     document.body.appendChild(layout);
     const page = layout.querySelector(".print-report-page");
-
     console.log("Layout:", layout.getBoundingClientRect());
     console.log("Page:", page.getBoundingClientRect());
     try {
@@ -2743,6 +2741,12 @@ async function exportReportPDF() {
             scrollX: 0,
             scrollY: 0
         });
+        document.body.appendChild(canvas);
+        canvas.style.position = "fixed";
+        canvas.style.top = "20px";
+        canvas.style.left = "20px";
+        canvas.style.zIndex = "999999";
+        canvas.style.border = "2px solid red";
         const imgData = canvas.toDataURL("image/jpeg", 1.0);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({
