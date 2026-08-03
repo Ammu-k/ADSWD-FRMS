@@ -2755,17 +2755,63 @@ async function exportReportPDF(){
 window.exportReportPDF = exportReportPDF;
 
 function exportReportExcel(){
-  const month=parseInt(document.getElementById('reportMonth').value);
-  const year=parseInt(document.getElementById('reportYear').value);
-  const dayVal=document.getElementById('reportDay').value;
-  let filtered;
-  if(dayVal){
-    filtered=records.filter(r=>r.date===dayVal);
-    exportRecordsToCSV(filtered,`report-${dayVal}.csv`);
-  }else{
-    filtered=records.filter(r=>{if(!r.date)return false;const d=new Date(r.date);return d.getMonth()===month&&d.getFullYear()===year;});
-    exportRecordsToCSV(filtered,`report-${year}-${month+1}.csv`);
-  }
+    const month = parseInt(document.getElementById('reportMonth').value);
+    const year = parseInt(document.getElementById('reportYear').value);
+    const dayVal = document.getElementById('reportDay').value;
+    let filtered;
+    if(dayVal){
+        filtered = records.filter(r => r.date === dayVal);
+    }else{
+        filtered = records.filter(r=>{
+            if(!r.date) return false;
+            const d = new Date(r.date);
+            return d.getMonth()===month && d.getFullYear()===year;
+        });
+    }
+    const receipts = filtered.filter(r=>r.type==="receipt");
+    const payments = filtered.filter(r=>r.type==="payment");
+    const rows = [];
+    rows.push([
+        "RECEIPTS","","","","","","",
+        "PAYMENTS","","","","","",""
+    ]);
+    rows.push([
+        "Date","Receipt No","Particulars","Net Pay","Deduction","Gross","Total",
+        "Date","Receipt No","Particulars","Token","UTR","Net Pay","Gross"
+    ]);
+    const maxRows = Math.max(receipts.length,payments.length);
+    for(let i=0;i<maxRows;i++){
+        const r = receipts[i] || {};
+        const p = payments[i] || {};
+        rows.push([
+            r.date || "",
+            r.receiptNo || "",
+            r.particulars || "",
+            r.netPay || "",
+            r.deduction || "",
+            r.grossAmount || "",
+            r.grossAmount || "",
+            p.date || "",
+            p.receiptNo || "",
+            p.beneficiary || "",
+            p.tokenNo || "",
+            p.utrNo || "",
+            p.netPay || "",
+            p.grossAmount || ""
+        ]);
+    }
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws["!cols"] = [
+        {wch:12},{wch:18},{wch:28},{wch:12},{wch:12},{wch:14},{wch:14},
+        {wch:12},{wch:18},{wch:28},{wch:14},{wch:14},{wch:12},{wch:14}
+    ];
+    XLSX.utils.book_append_sheet(wb,ws,"Cash Book");
+    const filename = dayVal
+        ? `CashBook-${dayVal}.xlsx`
+        : `CashBook-${year}-${month+1}.xlsx`;
+    XLSX.writeFile(wb,filename);
+    toast("Excel exported successfully","success");
 }
 window.exportReportExcel = exportReportExcel;
 
@@ -3063,5 +3109,7 @@ init();
 <script type="module" src="firebase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
 </body>
 </html>
