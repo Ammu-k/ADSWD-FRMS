@@ -2758,12 +2758,6 @@ async function exportReportPDF() {
         );
 
 const imgData = croppedCanvas.toDataURL("image/jpeg", 1.0);
-        document.body.appendChild(canvas);
-        canvas.style.position = "fixed";
-        canvas.style.top = "20px";
-        canvas.style.left = "20px";
-        canvas.style.zIndex = "999999";
-        canvas.style.border = "2px solid red";
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({
             orientation: "landscape",
@@ -2773,7 +2767,7 @@ const imgData = croppedCanvas.toDataURL("image/jpeg", 1.0);
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
 
-        const ratio = canvas.width / canvas.height;
+        const ratio = croppedCanvas.width / croppedCanvas.height;
         let imgWidth = pageWidth;
         let imgHeight = imgWidth / ratio;
 
@@ -2790,7 +2784,7 @@ const imgData = croppedCanvas.toDataURL("image/jpeg", 1.0);
             imgWidth,
             imgHeight
         });
-        pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight);
+        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
         pdf.save("ADSWD_Report.pdf");
     } catch (err) {
         console.error(err);
