@@ -2876,12 +2876,14 @@ function exportRecordsToCSV(data,filename){
   data.forEach(r=>{
     csv.push([r.date,r.type,r.receiptNo,r.particulars,r.beneficiary,r.netPay,r.deduction,r.grossAmount,r.tokenNo,r.utrNo,r.paymentDate].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
   });
-  const blob=new Blob([csv.join('\n')],{type:'text/csv'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);id="reportPage"
-  a.download=filename;
+  const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
   a.click();
-  toast(`${t('exported')} ${data.length} ${t('records')}!`,'success');
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
 }
 
 // ===== BACKUP =====
