@@ -2718,42 +2718,47 @@ function printReport(){
 }
 window.printReport = printReport;
 
-async function exportReportPDF(){
-    const layout=buildReportPrintLayout();
+async function exportReportPDF() {
+    const layout = buildReportPrintLayout();
     document.body.appendChild(layout);
-    await new Promise(resolve => setTimeout(resolve,300));
-    const canvas = await html2canvas(layout,{
-        scale:2,
-        useCORS:true,
-        backgroundColor:"#ffffff",
-        scrollX:0,
-        scrollY:0
-    });
-    const imgData = canvas.toDataURL("image/png");
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-        orientation:"landscape",
-        unit:"mm",
-        format:"a4"
-    });
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = pageWidth;
-    const imgHeight = canvas.height * imgWidth / canvas.width;
-    let heightLeft = imgHeight;
-    let position = 0;
-    pdf.addImage(imgData,"PNG",0,position,imgWidth,imgHeight);
-    heightLeft -= pageHeight;
-    while(heightLeft > 0){
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData,"PNG",0,position,imgWidth,imgHeight);
+    try {
+        await new Promise(r => setTimeout(r, 500));
+        const canvas = await html2canvas(layout, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            scrollX: 0,
+            scrollY: 0
+        });
+        const imgData = canvas.toDataURL("image/png");
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            orientation: "landscape",
+            unit: "mm",
+            format: "a4"
+        });
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = pageWidth;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 0;
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+        pdf.save("ADSWD_Report.pdf");
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    } finally {
+        layout.remove();
     }
-    pdf.save("ADSWD_Report.pdf");
-    layout.remove();
 }
-window.exportReportPDF = exportReportPDF;
 
 function exportReportExcel(){
     const month = parseInt(document.getElementById('reportMonth').value);
