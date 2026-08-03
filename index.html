@@ -2739,16 +2739,18 @@ async function exportReportPDF() {
         });
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
+
         const imgWidth = pageWidth;
         const imgHeight = canvas.height * imgWidth / canvas.width;
+
         console.log({
-        canvasWidth: canvas.width,
-        canvasHeight: canvas.height,
-        pageWidth,
-        pageHeight,
-        imgWidth,
-        imgHeight
-    });
+            canvasWidth: canvas.width,
+            canvasHeight: canvas.height,
+            pageWidth,
+            pageHeight,
+            imgWidth,
+            imgHeight
+        });
         let heightLeft = imgHeight;
         let position = 0;
         pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
