@@ -233,8 +233,8 @@ tr:hover{background:rgba(13,148,136,.03)}
 /* PRINT */
 @media print{
     @page{
-    size: A4 landscape;
-    margin: 5mm;
+        size: A4 landscape;
+        margin:5mm;
     }
     .sidebar,
     .topbar,
@@ -260,31 +260,53 @@ tr:hover{background:rgba(13,148,136,.03)}
         display:block!important;
     }
     .report-container{
-    border:none!important;
-    box-shadow:none!important;
-    width:100%!important;
-    max-width:none!important;
-    overflow:visible!important;
-    max-height:none!important;
-    height:auto!important;
+        border:none!important;
+        box-shadow:none!important;
+        width:100%!important;
+        max-width:none!important;
+        overflow:visible!important;
+        height:auto!important;
+    }
+    /* ===== KEEP BOTH TABLES SIDE BY SIDE ===== */
+    .report-body{
+        display:flex!important;
+        flex-direction:row!important;
+        justify-content:space-between!important;
+        align-items:flex-start!important;
+        gap:10px!important;
+        overflow:visible!important;
     }
     .report-body .report-section{
-    overflow:visible!important;
-}
-
-    .report-body{
-    overflow:visible!important;
+        width:50%!important;
+        flex:1 1 50%!important;
+        overflow:visible!important;
+        page-break-inside:avoid!important;
     }
-    table{
-    width:100%!important;
+    .report-body table{
+        width:100%!important;
+        table-layout:fixed!important;
+    }
+    .report-body th,
+    .report-body td{
+        white-space:normal!important;
+        word-break:break-word!important;
     }
     tr{
-    page-break-inside:avoid;
+        page-break-inside:avoid!important;
     }
 }
 
 .print-report-layout{display:none}
-.print-report-page{width:100%;min-height:100%;padding:10mm;box-sizing:border-box;background:#fff;color:#111;font-family:Arial, Helvetica, sans-serif}
+.print-report-page{
+    width:277mm;
+    height:190mm;
+    padding:5mm;
+    box-sizing:border-box;
+    background:#fff;
+    color:#111;
+    font-family:Arial, Helvetica, sans-serif;
+    overflow:hidden;
+}
 .print-report-page .print-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px}
 .print-report-page .print-logo{width:54px;height:54px;object-fit:contain}
 .print-report-page .print-title{font-size:18px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
@@ -294,12 +316,18 @@ tr:hover{background:rgba(13,148,136,.03)}
 .print-report-page .print-summary .summary-card{border:1px solid #d1d5db;border-radius:8px;padding:10px;background:#f9fafb}
 .print-report-page .print-summary .summary-card .label{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px}
 .print-report-page .print-summary .summary-card .value{font-size:14px;font-weight:700;margin-top:4px}
-.print-report-page .print-table{width:100%;border-collapse:collapse;font-size:10px}
+.print-report-page .print-table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+    font-size:8px;
+}
 .print-report-page .print-table th,.print-report-page .print-table td{border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top}
 .print-report-page .print-table th{background:#f3f4f6;font-weight:700}
 .print-report-page .print-table .print-total-row{font-weight:700;background:#f9fafb}
 .print-report-page .print-footer{display:flex;justify-content:space-between;gap:16px;margin-top:18px;font-size:11px;color:#374151}
 .print-report-page .print-footer .signature{flex:1;border-top:1px solid #9ca3af;padding-top:6px;text-align:center}
+
 @media print{
     .print-report-layout{display:block!important;position:static!important;left:auto!important;top:auto!important;z-index:auto!important}
     .print-report-page{padding:0}
@@ -2850,7 +2878,7 @@ function exportRecordsToCSV(data,filename){
   });
   const blob=new Blob([csv.join('\n')],{type:'text/csv'});
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
+  a.href=URL.createObjectURL(blob);id="reportPage"
   a.download=filename;
   a.click();
   toast(`${t('exported')} ${data.length} ${t('records')}!`,'success');
