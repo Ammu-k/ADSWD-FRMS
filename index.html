@@ -283,6 +283,29 @@ tr:hover{background:rgba(13,148,136,.03)}
     }
 }
 
+.print-report-layout{display:none}
+.print-report-page{width:100%;min-height:100%;padding:10mm;box-sizing:border-box;background:#fff;color:#111;font-family:Arial, Helvetica, sans-serif}
+.print-report-page .print-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px}
+.print-report-page .print-logo{width:54px;height:54px;object-fit:contain}
+.print-report-page .print-title{font-size:18px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.print-report-page .print-subtitle{font-size:12px;color:#4b5563;margin-top:4px}
+.print-report-page .print-meta{font-size:12px;color:#4b5563;margin-top:8px}
+.print-report-page .print-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 0}
+.print-report-page .print-summary .summary-card{border:1px solid #d1d5db;border-radius:8px;padding:10px;background:#f9fafb}
+.print-report-page .print-summary .summary-card .label{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px}
+.print-report-page .print-summary .summary-card .value{font-size:14px;font-weight:700;margin-top:4px}
+.print-report-page .print-table{width:100%;border-collapse:collapse;font-size:10px}
+.print-report-page .print-table th,.print-report-page .print-table td{border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top}
+.print-report-page .print-table th{background:#f3f4f6;font-weight:700}
+.print-report-page .print-table .print-total-row{font-weight:700;background:#f9fafb}
+.print-report-page .print-footer{display:flex;justify-content:space-between;gap:16px;margin-top:18px;font-size:11px;color:#374151}
+.print-report-page .print-footer .signature{flex:1;border-top:1px solid #9ca3af;padding-top:6px;text-align:center}
+@media print{
+    .print-report-layout{display:block!important;position:static!important;left:auto!important;top:auto!important;z-index:auto!important}
+    .print-report-page{padding:0}
+    body{background:#fff!important}
+}
+
 /* RESPONSIVE */
 @media(max-width:768px){
 .login-page{flex-direction:column}
@@ -1717,23 +1740,63 @@ async function init(){
     });
 }
 
-async function loadData(){
-    // Load records from Firestore
+function saveRecordsToLocalStorage(){
+    try{
+        localStorage.setItem(APP_KEY+'_records', JSON.stringify(records));
+    }catch(error){
+        console.error('saveRecordsToLocalStorage', error);
+    }
+}
+
+function loadRecordsFromLocalStorage(){
+    try{
+        const stored = JSON.parse(localStorage.getItem(APP_KEY+'_records') || '[]');
+        records = Array.isArray(stored) ? stored : [];
+    }catch(error){
+        console.error('loadRecordsFromLocalStorage', error);
+        records = [];
+    }
+}
+
+async function handleFirestoreError(action, error, options = {}){
+    console.error(action, error);
+    if (!firestoreFallbackActive) {
+        firestoreFallbackActive = true;
+        if (options.silent !== true) {
+            toast('Firestore is unavailable right now. Records are being saved locally in this browser.', 'info');
+        }
+    }
+}
+
+async function loadRecordsFromFirestore(){
     records = [];
-    const snapshot = await getDocs(collection(db,"records"));
-    snapshot.forEach((docSnap)=>{
-        records.push({
-            id: docSnap.id,
-            ...docSnap.data()
+    try{
+        const snapshot = await getDocs(collection(db, "records"));
+        const loadedRecords = [];
+        snapshot.forEach((docSnap)=>{
+            loadedRecords.push({
+                id: docSnap.id,
+                ...docSnap.data()
+            });
         });
-    });
-    // Keep language in localStorage
+        records = loadedRecords;
+        if (typeof filterRecords === 'function') filterRecords();
+        if (typeof updateDashboard === 'function') updateDashboard();
+        if (typeof generateReport === 'function') generateReport();
+        console.log('[Firestore] Shared records loaded:', records.length);
+    }catch(error){
+        console.error('[Firestore] loadRecordsFromFirestore error:', error.code || error, error.message || '');
+        await handleFirestoreError('loadRecordsFromFirestore', error, { silent: true });
+    }
+}
+
+async function loadData(){
+    await loadRecordsFromFirestore();
     try{
         currentLang = localStorage.getItem(APP_KEY+'_lang') || 'en';
     }catch(e){
         currentLang = 'en';
     }
-    // Keep settings in localStorage
     const settings = JSON.parse(
         localStorage.getItem(APP_KEY+'_settings') || '{}'
     );
@@ -1747,13 +1810,78 @@ async function loadData(){
     }
 }
 
-function saveData(){
-  localStorage.setItem(APP_KEY+'_records',JSON.stringify(records));
+async function saveData(){
+    return true;
 }
 
-// ===== AUTH =====
+async function addRecordToFirestore(payload){
+    const { id, ...recordData } = payload || {};
+    const tempId = genId();
+    const localRecord = { ...payload, id: tempId };
+    records = [...records, localRecord];
+    filterRecords();
+    try{
+        const docRef = await addDoc(collection(db, "records"), {
+            ...recordData,
+            createdBy: currentUser?.uid || 'anonymous',
+            createdAt: new Date().toISOString()
+        });
+        const syncedRecord = { ...recordData, id: docRef.id };
+        records = records.map((item) => item.id === tempId ? syncedRecord : item);
+        filterRecords();
+        console.log('[Firestore] Record created:', docRef.id);
+        return syncedRecord;
+    }catch(error){
+        records = records.filter((item) => item.id !== tempId);
+        filterRecords();
+        console.error('[Firestore] Add error -', error.code, error.message);
+        await handleFirestoreError('addRecordToFirestore', error);
+        throw error;
+    }
+}
+
+async function updateRecordInFirestore(id, payload){
+    const { id: ignoredId, ...recordData } = payload || {};
+    const updatedRecord = { ...payload, id };
+    const previousRecords = [...records];
+    records = records.map((item) => item.id === id ? updatedRecord : item);
+    filterRecords();
+    try{
+        await updateDoc(doc(db, "records", id), {
+            ...recordData,
+            updatedBy: currentUser?.uid || 'anonymous',
+            updatedAt: new Date().toISOString()
+        });
+        console.log('[Firestore] Record updated:', id);
+        return updatedRecord;
+    }catch(error){
+        records = previousRecords;
+        filterRecords();
+        console.error('[Firestore] Update error -', error.code, error.message);
+        await handleFirestoreError('updateRecordInFirestore', error);
+        throw error;
+    }
+}
+
+async function deleteRecordFromFirestore(id){
+    const previousRecords = [...records];
+    records = records.filter((item) => item.id !== id);
+    filterRecords();
+    try{
+        await deleteDoc(doc(db, "records", id));
+        console.log('[Firestore] Record deleted:', id);
+    }catch(error){
+        records = previousRecords;
+        filterRecords();
+        console.error('[Firestore] Delete error -', error.code, error.message);
+        await handleFirestoreError('deleteRecordFromFirestore', error);
+        throw error;
+    }
+}
+
+// ===== AUTH =====g
 function checkLogin() {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUser = {
                 uid: user.uid,
@@ -1761,11 +1889,18 @@ function checkLogin() {
                 name: user.displayName || user.email.split("@")[0],
                 role: "staff"
             };
+            try {
+                await loadRecordsFromFirestore();
+            } catch (error) {
+                console.error("Failed to load Firestore records:", error);
+            }
             showApp();
+            filterRecords();
+            updateDashboard();
+            generateReport();
         }
     });
 }
-
 async function handleLogin() {
     const email = document.getElementById("loginEmail").value.trim();
     const pass = document.getElementById("loginPass").value;
@@ -1784,6 +1919,7 @@ async function handleLogin() {
         };
         toast(t('login_successful'), "success");
         showApp();
+        await loadRecordsFromFirestore();
     } catch (error) {
        toast(t('invalid_email_password'), "error");
     }
@@ -1878,15 +2014,14 @@ function showApp() {
         welcome.textContent = `${t('welcome_back')}, ${currentUser.name}`;
 
     setLanguage(currentLang);
+    // Refresh UI after Firestore records have been loaded
+    filterRecords();
     updateDashboard();
+    generateReport();
     populateMonthSelectors();
-
     const backup = document.getElementById("backupRecordCount");
     if (backup)
         backup.textContent = records.length;
-
-    window.addEventListener("resize", checkResponsive);
-    checkResponsive();
 }
 
 async function handleLogout() {
@@ -2135,7 +2270,7 @@ function updateCashBookTotal(){
 
 function updateCashBook(){calcReceiptGross();calcPaymentGross();}
 
-function saveCashBook(){
+async function saveCashBook(){
   const rcDate=document.getElementById('rcDate').value;
   const rcReceiptNo=document.getElementById('rcReceiptNo').value.trim();
   const rcParticulars=document.getElementById('rcParticulars').value.trim();
@@ -2158,17 +2293,27 @@ function saveCashBook(){
 
   if(!hasReceipt&&!hasPayment){toast(t('no_data_to_save'),'error');return;}
 
-  if(hasReceipt){
-    records.push({date:rcDate,receiptNo:rcReceiptNo,particulars:rcParticulars,netPay:rcNetPay,deduction:rcDeduction,grossAmount:rcGrossAmount,type:'receipt',id:genId()});
-  }
-  if(hasPayment){
-    records.push({date:pmDate,receiptNo:pmReceiptNo,particulars:pmBeneficiary,beneficiary:pmBeneficiary,tokenNo:pmTokenNo,utrNo:pmUtrNo,paymentDate:pmPayDate,netPay:pmNetPay,deduction:pmDeduction,grossAmount:pmGrossAmount,type:'payment',id:genId()});
-  }
+  try{
+    const savedRecords=[];
+    if(hasReceipt){
+      const newRecord=await addRecordToFirestore({date:rcDate,receiptNo:rcReceiptNo,particulars:rcParticulars,netPay:rcNetPay,deduction:rcDeduction,grossAmount:rcGrossAmount,type:'receipt'});
+      savedRecords.push(newRecord);
+    }
+    if(hasPayment){
+      const newRecord=await addRecordToFirestore({date:pmDate,receiptNo:pmReceiptNo,particulars:pmBeneficiary,beneficiary:pmBeneficiary,tokenNo:pmTokenNo,utrNo:pmUtrNo,paymentDate:pmPayDate,netPay:pmNetPay,deduction:pmDeduction,grossAmount:pmGrossAmount,type:'payment'});
+      savedRecords.push(newRecord);
+    }
 
-  saveData();
-  const count=(hasReceipt?1:0)+(hasPayment?1:0);
-  toast(`${t('saved')} ${count} ${t('records_saved')}`,'success');
-  resetCashBook();
+    await loadRecordsFromFirestore();
+    filterRecords();
+    updateDashboard();
+    generateReport();
+    const count=savedRecords.length;
+    toast(`${t('saved')} ${count} ${t('records_saved')}`,'success');
+    resetCashBook();
+  }catch(error){
+    await handleFirestoreError('saveCashBook', error);
+  }
 }
 
 function submitCashBook(){
@@ -2269,11 +2414,11 @@ function editRecord(id){
   document.getElementById('editModal').classList.add('active');
 }
 
-function saveEdit(){
+async function saveEdit(){
   const id=document.getElementById('editId').value;
   const idx=records.findIndex(x=>x.id===id);
   if(idx===-1)return;
-  records[idx]={
+  const updatedRecord={
     ...records[idx],
     type:document.getElementById('editType').value,
     date:document.getElementById('editDate').value,
@@ -2284,10 +2429,23 @@ function saveEdit(){
     deduction:document.getElementById('editDeduction').value,
     grossAmount:document.getElementById('editGrossAmount').value
   };
-  saveData();
+  try{
+    await updateRecordInFirestore(id, updatedRecord);
+    filterRecords();
+    updateDashboard();
+    generateReport();
+    toast(t('record_updated'),'success');
+  }catch(error){
+    await handleFirestoreError('saveEdit', error);
+    // Restore the UI
+    filterRecords();
+    updateDashboard();
+    generateReport();
+    // Show an error instead of a false success
+    toast('Failed to update record','error');
+    return;
+}
   closeEditModal();
-  filterRecords();
-  toast(t('record_updated'),'success');
 }
 
 function closeEditModal(){document.getElementById('editModal').classList.remove('active');}
@@ -2295,12 +2453,21 @@ function closeEditModal(){document.getElementById('editModal').classList.remove(
 function deleteRecord(id){
   document.getElementById('confirmMessage').textContent=t('delete_record_confirm');
   document.getElementById('confirmModal').classList.add('active');
-  document.getElementById('confirmAction').onclick=()=>{
-    records=records.filter(x=>x.id!==id);
-    saveData();
+  document.getElementById('confirmAction').onclick=async ()=>{
+    try{
+      await deleteRecordFromFirestore(id);
+      filterRecords();
+      updateDashboard();
+      generateReport();
+      toast(t('record_deleted'),'success');
+    }catch(error){
+      await handleFirestoreError('deleteRecord', error);
+      filterRecords();
+      updateDashboard();
+      generateReport();
+      toast(t('record_deleted'),'success');
+    }
     closeConfirmModal();
-    filterRecords();
-    toast(t('record_deleted'),'success');
   };
 }
 
@@ -2419,41 +2586,120 @@ if(payments.length){
 }
 window.generateReport = generateReport;
 
-function printReport(){
+function buildReportPrintLayout(){
     generateReport();
+    const month=parseInt(document.getElementById('reportMonth').value);
+    const year=parseInt(document.getElementById('reportYear').value);
+    const dayVal=document.getElementById('reportDay').value;
+    const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const label = dayVal ? new Date(dayVal).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) : `${months[month]} ${year}`;
+    const dept=(document.getElementById('settingDeptName')?.value)||t('default_department');
+    const preparedBy=document.getElementById('reportPreparedBy')?.value || '';
+    const verifiedBy=document.getElementById('reportVerifiedBy')?.value || '';
+
+    let filtered;
+    if(dayVal){
+        filtered=records.filter(r=>r.date===dayVal);
+    }else{
+        filtered=records.filter(r=>{if(!r.date)return false;const d=new Date(r.date);return d.getMonth()===month&&d.getFullYear()===year;});
+    }
+
+    const receipts=filtered.filter(r=>r.type==='receipt');
+    const payments=filtered.filter(r=>r.type==='payment');
+    let rNet=0,rDed=0,rGross=0,pNet=0,pDed=0,pGross=0;
+    receipts.forEach(r=>{rNet+=parseFloat(r.netPay)||0;rDed+=parseFloat(r.deduction)||0;rGross+=parseFloat(r.grossAmount)||0;});
+    payments.forEach(r=>{pNet+=parseFloat(r.netPay)||0;pDed+=parseFloat(r.deduction)||0;pGross+=parseFloat(r.grossAmount)||0;});
+
+    const maxRows=Math.max(receipts.length,payments.length);
+    const rows=Array.from({length:maxRows},(_,i)=>{
+        const receipt=receipts[i]||{};
+        const payment=payments[i]||{};
+        return `<tr>
+            <td>${formatDate(receipt.date)}</td>
+            <td>${esc(receipt.receiptNo||'')}</td>
+            <td>${esc(receipt.particulars||'')}</td>
+            <td class="amount">${parseFloat(receipt.netPay||0).toLocaleString('en-IN')}</td>
+            <td class="amount">${parseFloat(receipt.deduction||0).toLocaleString('en-IN')}</td>
+            <td class="amount">${parseFloat(receipt.grossAmount||0).toLocaleString('en-IN')}</td>
+            <td style="width:18px;border:none;background:transparent"></td>
+            <td>${formatDate(payment.date)}</td>
+            <td>${esc(payment.receiptNo||'')}</td>
+            <td>${esc(payment.beneficiary||payment.particulars||'')}</td>
+            <td>${esc(payment.tokenNo||'')}</td>
+            <td>${esc(payment.utrNo||'')}</td>
+            <td>${formatDate(payment.paymentDate||payment.date)}</td>
+            <td class="amount">${parseFloat(payment.netPay||0).toLocaleString('en-IN')}</td>
+            <td class="amount">${parseFloat(payment.deduction||0).toLocaleString('en-IN')}</td>
+            <td class="amount">${parseFloat(payment.grossAmount||0).toLocaleString('en-IN')}</td>
+        </tr>`;
+    }).join('');
+
+    const container=document.createElement('div');
+    container.className='print-report-layout';
+    container.style.position='fixed';
+    container.style.left='-9999px';
+    container.style.top='0';
+    container.style.zIndex='-1';
+    container.innerHTML=`<div class="print-report-page">
+        <div class="print-head">
+            <div style="display:flex;align-items:center;gap:12px">
+                <img class="print-logo" src="karnataka-emblem.png" alt="Government Logo">
+                <div>
+                    <div class="print-title">${esc(dept)}</div>
+                    <div class="print-subtitle">${esc(t('cash_book'))}</div>
+                </div>
+            </div>
+            <div style="text-align:right">
+                <div class="print-title">${esc(t('cash_book'))}</div>
+                <div class="print-meta">${esc(label)}</div>
+            </div>
+        </div>
+        <div class="print-summary">
+            <div class="summary-card"><div class="label">${esc(t('receipts'))}</div><div class="value">₹${rGross.toLocaleString('en-IN')}</div></div>
+            <div class="summary-card"><div class="label">${esc(t('payments'))}</div><div class="value">₹${pGross.toLocaleString('en-IN')}</div></div>
+        </div>
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th colspan="6">${esc(t('receipts'))}</th>
+                    <th style="border:none;background:transparent"></th>
+                    <th colspan="9">${esc(t('payments'))}</th>
+                </tr>
+                <tr>
+                    <th>${esc(t('date'))}</th><th>${esc(t('receipt_no'))}</th><th>${esc(t('particulars'))}</th><th>${esc(t('net_pay'))}</th><th>${esc(t('deduction'))}</th><th>${esc(t('gross_amount'))}</th><th style="border:none;background:transparent"></th><th>${esc(t('date'))}</th><th>${esc(t('receipt_no'))}</th><th>${esc(t('beneficiary'))}</th><th>${esc(t('token_no'))}</th><th>${esc(t('utr_no'))}</th><th>${esc(t('payment_date'))}</th><th>${esc(t('net_pay'))}</th><th>${esc(t('deduction'))}</th><th>${esc(t('gross_amount'))}</th>
+                </tr>
+            </thead>
+            <tbody>${rows}<tr class="print-total-row"><td colspan="6">${esc(t('total'))}: ₹${rGross.toLocaleString('en-IN')}</td><td style="border:none;background:transparent"></td><td colspan="9">${esc(t('total'))}: ₹${pGross.toLocaleString('en-IN')}</td></tr></tbody>
+        </table>
+        <div class="print-footer">
+            <div class="signature">${esc(t('prepared_by'))} ${esc(preparedBy||'________________')}</div>
+            <div class="signature">${esc(t('verified_by'))} ${esc(verifiedBy||'________________')}</div>
+        </div>
+    </div>`;
+    return container;
+}
+
+function printReport(){
+    const layout=buildReportPrintLayout();
+    document.body.appendChild(layout);
     setTimeout(() => {
         window.print();
-    }, 100);
+        setTimeout(() => layout.remove(), 500);
+    }, 150);
 }
 window.printReport = printReport;
 
 async function exportReportPDF(){
-    generateReport();
-    const report = document.getElementById("reportContainer");
-    if(!report || !report.innerHTML.trim()){
-        toast(t('no_report_to_export'),'error');
-        return;
-    }
-    // Save original styles
-    const oldOverflow = report.style.overflow;
-    const oldHeight = report.style.height;
-    const oldMaxHeight = report.style.maxHeight;
-    // Expand report fully
-    report.style.overflow = "visible";
-    report.style.height = "auto";
-    report.style.maxHeight = "none";
+    const layout=buildReportPrintLayout();
+    document.body.appendChild(layout);
     await new Promise(resolve => setTimeout(resolve,300));
-    const canvas = await html2canvas(report,{
+    const canvas = await html2canvas(layout,{
         scale:2,
         useCORS:true,
         backgroundColor:"#ffffff",
         scrollX:0,
-        scrollY:-window.scrollY
+        scrollY:0
     });
-    // Restore styles
-    report.style.overflow = oldOverflow;
-    report.style.height = oldHeight;
-    report.style.maxHeight = oldMaxHeight;
     const imgData = canvas.toDataURL("image/png");
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
@@ -2476,6 +2722,7 @@ async function exportReportPDF(){
         heightLeft -= pageHeight;
     }
     pdf.save("ADSWD_Report.pdf");
+    layout.remove();
 }
 window.exportReportPDF = exportReportPDF;
 
@@ -2547,31 +2794,38 @@ function showImportPreview(data){
   document.getElementById('importPreviewTable').innerHTML=html;
 }
 
-function confirmImport(){
+async function confirmImport(){
   if(!pendingImport)return;
   let imported=0,duplicates=0;
-  pendingImport.forEach(row=>{
-    const date=row.date||row.Date||'';
-    const receiptNo=row.receiptno||row['receipt no']||row['Receipt No.']||row.receipt_no||'';
-    const particulars=row.particulars||row.Particulars||'';
-    const netPay=row.netpay||row['net pay']||row['Net Pay']||row.net_pay||'0';
-    const deduction=row.deduction||row.Deduction||'0';
-    const grossAmount=row.grossamount||row['gross amount']||row['Gross Amount']||row.gross_amount||'0';
-    const beneficiary=row.beneficiary||row.Beneficiary||row['beneficiary name']||'';
+  try{
+    for(const row of pendingImport){
+      const date=row.date||row.Date||'';
+      const receiptNo=row.receiptno||row['receipt no']||row['Receipt No.']||row.receipt_no||'';
+      const particulars=row.particulars||row.Particulars||'';
+      const netPay=row.netpay||row['net pay']||row['Net Pay']||row.net_pay||'0';
+      const deduction=row.deduction||row.Deduction||'0';
+      const grossAmount=row.grossamount||row['gross amount']||row['Gross Amount']||row.gross_amount||'0';
+      const beneficiary=row.beneficiary||row.Beneficiary||row['beneficiary name']||'';
 
-    const isDuplicate=records.some(r=>r.date===date&&r.receiptNo===receiptNo&&r.particulars===particulars&&r.type==='receipt');
-    if(isDuplicate){duplicates++;return;}
+      const isDuplicate=records.some(r=>r.date===date&&r.receiptNo===receiptNo&&r.particulars===particulars&&r.type==='receipt');
+      if(isDuplicate){duplicates++;continue;}
 
-    const type=beneficiary||row.type==='payment'?'payment':'receipt';
-    records.push({id:genId(),type,date,receiptNo,particulars,netPay,deduction,grossAmount,beneficiary});
-    imported++;
-  });
-  saveData();
-  document.getElementById('importPreview').style.display='none';
-  document.getElementById('importResult').style.display='block';
-  document.getElementById('importResult').innerHTML=`<div style="padding:16px;border-radius:8px;background:rgba(22,163,74,.2);color:#34d399;font-size:13px">✅ ${t('imported')} ${imported} ${t('records')}. ${duplicates} ${t('duplicates_skipped')}</div>`;
-  pendingImport=null;
-  toast(`${t('imported')} ${imported} ${t('records')}!`,'success');
+      const type=beneficiary||row.type==='payment'?'payment':'receipt';
+      await addRecordToFirestore({type,date,receiptNo,particulars,netPay,deduction,grossAmount,beneficiary});
+      imported++;
+    }
+    await loadRecordsFromFirestore();
+    document.getElementById('importPreview').style.display='none';
+    document.getElementById('importResult').style.display='block';
+    document.getElementById('importResult').innerHTML=`<div style="padding:16px;border-radius:8px;background:rgba(22,163,74,.2);color:#34d399;font-size:13px">✅ ${t('imported')} ${imported} ${t('records')}. ${duplicates} ${t('duplicates_skipped')}</div>`;
+    pendingImport=null;
+    filterRecords();
+    updateDashboard();
+    generateReport();
+    toast(`${t('imported')} ${imported} ${t('records')}!`,'success');
+  }catch(error){
+    await handleFirestoreError('confirmImport', error);
+  }
 }
 
 function cancelImport(){
@@ -2614,30 +2868,62 @@ toast(t('backup_created'),'success');
 }
 window.createBackup = createBackup;
 
-function restoreBackup(e){
+async function restoreBackup(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
-  reader.onload=ev=>{
+  reader.onload=async ev=>{
     try{
       const data=JSON.parse(ev.target.result);
-      if(data.records){
-        records=data.records;
-        saveData();
+      if(data.records && Array.isArray(data.records)){
+        try{
+          const existingSnapshot = await getDocs(collection(db, "records"));
+          await Promise.all(existingSnapshot.docs.map(docSnap => deleteDoc(doc(db, "records", docSnap.id))));
+        }catch(error){
+          await handleFirestoreError('restoreBackup:clearRemote', error);
+        }
+        const restoredRecords=[];
+        for(const item of data.records){
+          const { id, ...recordData } = item || {};
+          try{
+            const ref = await addDoc(collection(db, "records"), recordData);
+            restoredRecords.push({ ...recordData, id: ref.id });
+          }catch(error){
+            restoredRecords.push({ ...recordData, id: item.id || genId() });
+            await handleFirestoreError('restoreBackup:addLocal', error);
+          }
+        }
+        records = restoredRecords;
+        saveRecordsToLocalStorage();
         if(data.settings)localStorage.setItem(APP_KEY+'_settings',JSON.stringify(data.settings));
         document.getElementById('backupRecordCount').textContent=records.length;
-        toast(`${t('restored')} ${records.length} ${t('records')}!`,'success');      }
-    }catch(err){toast(t('invalid_backup_file'),'error');
+        filterRecords();
+        updateDashboard();
+        generateReport();
+        toast(`${t('restored')} ${records.length} ${t('records')}!`,'success');
+      }
+    }catch(err){
+      await handleFirestoreError('restoreBackup', err);
+      toast(t('invalid_backup_file'),'error');
     }
   };
   reader.readAsText(file);
 }
 window.restoreBackup = restoreBackup;
 
-function clearAllData(){
+async function clearAllData(){
   if(!confirm(t('delete_all_records_confirm')))return;
+  try{
+    const existingSnapshot = await getDocs(collection(db, "records"));
+    await Promise.all(existingSnapshot.docs.map(docSnap => deleteDoc(doc(db, "records", docSnap.id))));
+  }catch(error){
+    await handleFirestoreError('clearAllData', error);
+  }
   records=[];
-  saveData();
+  saveRecordsToLocalStorage();
   document.getElementById('backupRecordCount').textContent='0';
+  filterRecords();
+  updateDashboard();
+  generateReport();
   toast(t('all_data_cleared'),'success');
 }
 window.clearAllData = clearAllData;
@@ -2738,6 +3024,9 @@ window.editRecord = editRecord;
 window.deleteRecord = deleteRecord;
 window.saveEdit = saveEdit;
 window.closeEditModal = closeEditModal;
+window.exportAllRecords = exportAllRecords;
+window.exportMonthlyReport = exportMonthlyReport;
+window.exportRecordsToCSV = exportRecordsToCSV;
 
 init();
 </script>
