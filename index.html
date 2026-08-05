@@ -388,7 +388,7 @@ tr:hover{background:rgba(13,148,136,.03)}
 <div class="login-page" id="loginPage">
 <div class="login-left">
 <div class="login-left-header">
-<img src="Karnataka-emblem.png" class="logo">
+<img src="./Karnataka-emblem.png" class="logo">
 <div class="login-left-header-text">
 <h2>ADSWD BIDAR</h2>
 <p>GOVERNMENT OF KARNATAKA</p>
@@ -492,7 +492,7 @@ Create Account
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
 <div class="sidebar-header" style="justify-content:center;padding:16px 12px">
-<img src="Karnataka-emblem.png" class="logo">
+<img src="./Karnataka-emblem.png" class="logo">
 <nav class="sidebar-nav" id="sidebarNav">
 <div class="nav-item active" onclick="navigateTo('dashboard')" data-page="dashboard">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -761,7 +761,7 @@ Create Account
     ADSWD BIDAR
 </div>
 <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px">
-<img src="Karnataka-emblem.png" class="logo">
+<img src="./Karnataka-emblem.png" class="logo">
 <div style="text-align:left">
 <div style="font-size:16px;font-weight:700;letter-spacing:1px">ADSWD BIDAR</div>
 </div>
@@ -1940,15 +1940,16 @@ function checkLogin() {
             try {
                 await loadRecordsFromFirestore();
             } catch (error) {
-                console.error("Failed to load Firestore records:", error);
+                console.error(error);
             }
             showApp();
-            filterRecords();
-            updateDashboard();
-            generateReport();
+        } else {
+            document.getElementById("loginPage").style.display = "flex";
+            document.getElementById("appLayout").style.display = "none";
         }
     });
 }
+
 async function handleLogin() {
     const email = document.getElementById("loginEmail").value.trim();
     const pass = document.getElementById("loginPass").value;
