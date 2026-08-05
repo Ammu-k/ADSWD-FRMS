@@ -1207,7 +1207,6 @@ import {
     deleteDoc,
     getDoc,
     setDoc,
-    serverTimestamp,
     GoogleAuthProvider,
     signInWithPopup,
     createUserWithEmailAndPassword,
@@ -1873,7 +1872,7 @@ async function addRecordToFirestore(payload){
         const docRef = await addDoc(collection(db, "records"), {
             ...recordData,
             createdBy: currentUser?.email || "anonymous",
-            createdAt: serverTimestamp()
+            updatedAt: new Date().toISOString(),
         });
         const syncedRecord = { ...recordData, id: docRef.id };
         records = records.map((item) => item.id === tempId ? syncedRecord : item);
@@ -1899,7 +1898,7 @@ async function updateRecordInFirestore(id, payload){
         await updateDoc(doc(db, "records", id), {
             ...recordData,
             updatedBy: currentUser?.email || "anonymous",
-            updatedAt: serverTimestamp()
+            updatedAt: new Date().toISOString(),
         });
         console.log('[Firestore] Record updated:', id);
         return updatedRecord;
