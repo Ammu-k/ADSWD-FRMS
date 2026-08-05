@@ -344,8 +344,8 @@ tr:hover{background:rgba(13,148,136,.03)}
 .print-report-page .print-table{
     width:100%;
     border-collapse:collapse;
-    table-layout:fixed;
-    font-size:8px;
+    table-layout:auto;
+    font-size:10px;
 }
 .print-report-page .print-table th,.print-report-page .print-table td{border:1px solid #d1d5db;padding:6px 8px;text-align:left;vertical-align:top}
 .print-report-page .print-table th{background:#f3f4f6;font-weight:700}
@@ -2649,104 +2649,7 @@ if(payments.length){
 }
 window.generateReport = generateReport;
 
-function buildReportPrintLayout(){
-    generateReport();
-    const month=parseInt(document.getElementById('reportMonth').value);
-    const year=parseInt(document.getElementById('reportYear').value);
-    const dayVal=document.getElementById('reportDay').value;
-    const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const label = dayVal ? new Date(dayVal).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) : `${months[month]} ${year}`;
-    const dept=(document.getElementById('settingDeptName')?.value)||t('default_department');
-    const preparedBy=document.getElementById('reportPreparedBy')?.value || '';
-    const verifiedBy=document.getElementById('reportVerifiedBy')?.value || '';
 
-    let filtered;
-    if(dayVal){
-        filtered=records.filter(r=>r.date===dayVal);
-    }else{
-        filtered=records.filter(r=>{if(!r.date)return false;const d=new Date(r.date);return d.getMonth()===month&&d.getFullYear()===year;});
-    }
-
-    const receipts=filtered.filter(r=>r.type==='receipt');
-    const payments=filtered.filter(r=>r.type==='payment');
-    let rNet=0,rDed=0,rGross=0,pNet=0,pDed=0,pGross=0;
-    receipts.forEach(r=>{rNet+=parseFloat(r.netPay)||0;rDed+=parseFloat(r.deduction)||0;rGross+=parseFloat(r.grossAmount)||0;});
-    payments.forEach(r=>{pNet+=parseFloat(r.netPay)||0;pDed+=parseFloat(r.deduction)||0;pGross+=parseFloat(r.grossAmount)||0;});
-
-    const maxRows=Math.max(receipts.length,payments.length);
-    const rows=Array.from({length:maxRows},(_,i)=>{
-        const receipt=receipts[i]||{};
-        const payment=payments[i]||{};
-        return `<tr>
-            <td>${formatDate(receipt.date)}</td>
-            <td>${esc(receipt.receiptNo||'')}</td>
-            <td>${esc(receipt.particulars||'')}</td>
-            <td class="amount">${parseFloat(receipt.netPay||0).toLocaleString('en-IN')}</td>
-            <td class="amount">${parseFloat(receipt.deduction||0).toLocaleString('en-IN')}</td>
-            <td class="amount">${parseFloat(receipt.grossAmount||0).toLocaleString('en-IN')}</td>
-            <td style="width:18px;border:none;background:transparent"></td>
-            <td>${formatDate(payment.date)}</td>
-            <td>${esc(payment.receiptNo||'')}</td>
-            <td>${esc(payment.beneficiary||payment.particulars||'')}</td>
-            <td>${esc(payment.tokenNo||'')}</td>
-            <td>${esc(payment.utrNo||'')}</td>
-            <td>${formatDate(payment.paymentDate||payment.date)}</td>
-            <td class="amount">${parseFloat(payment.netPay||0).toLocaleString('en-IN')}</td>
-            <td class="amount">${parseFloat(payment.deduction||0).toLocaleString('en-IN')}</td>
-            <td class="amount">${parseFloat(payment.grossAmount||0).toLocaleString('en-IN')}</td>
-        </tr>`;
-    }).join('');
-
-    const container=document.createElement('div');
-    container.className='print-report-layout';
-    container.style.position = "fixed";
-    container.style.left = "0";
-    container.style.top = "0";
-    container.style.visibility = "hidden";
-    container.style.pointerEvents = "none";
-    container.style.zIndex = "-1";
-    container.style.width = "1123px";   // A4 landscape
-    container.style.background = "#fff";
-    container.innerHTML=`<div class="print-report-page">
-        <div class="print-head">
-            <div style="display:flex;align-items:center;gap:12px">
-                <!-- <img class="print-logo" src="karnataka-emblem.png" alt="Government Logo"> -->
-                <!-- Logo removed for testing -->
-                <div>
-                    <div class="print-title">${esc(dept)}</div>
-                    <div class="print-subtitle">${esc(t('cash_book'))}</div>
-                </div>
-            </div>
-            <div style="text-align:right">
-                <div class="print-title">${esc(t('cash_book'))}</div>
-                <div class="print-meta">${esc(label)}</div>
-            </div>
-        </div>
-        <div class="print-summary">
-            <div class="summary-card"><div class="label">${esc(t('receipts'))}</div><div class="value">₹${rGross.toLocaleString('en-IN')}</div></div>
-            <div class="summary-card"><div class="label">${esc(t('payments'))}</div><div class="value">₹${pGross.toLocaleString('en-IN')}</div></div>
-        </div>
-        <table class="print-table">
-            <thead>
-                <tr>
-                    <th colspan="6">${esc(t('receipts'))}</th>
-                    <th style="border:none;background:transparent"></th>
-                    <th colspan="9">${esc(t('payments'))}</th>
-                </tr>
-                <tr>
-                    <th>${esc(t('date'))}</th><th>${esc(t('receipt_no'))}</th><th>${esc(t('particulars'))}</th><th>${esc(t('net_pay'))}</th><th>${esc(t('deduction'))}</th><th>${esc(t('gross_amount'))}</th><th style="border:none;background:transparent"></th><th>${esc(t('date'))}</th><th>${esc(t('receipt_no'))}</th><th>${esc(t('beneficiary'))}</th><th>${esc(t('token_no'))}</th><th>${esc(t('utr_no'))}</th><th>${esc(t('payment_date'))}</th><th>${esc(t('net_pay'))}</th><th>${esc(t('deduction'))}</th><th>${esc(t('gross_amount'))}</th>
-                </tr>
-            </thead>
-            <tbody>${rows}<tr class="print-total-row"><td colspan="6">${esc(t('total'))}: ₹${rGross.toLocaleString('en-IN')}</td><td style="border:none;background:transparent"></td><td colspan="9">${esc(t('total'))}: ₹${pGross.toLocaleString('en-IN')}</td></tr></tbody>
-        </table>
-        <div class="print-footer">
-            <div class="signature">${esc(t('prepared_by'))} ${esc(preparedBy||'________________')}</div>
-            <div class="signature">${esc(t('verified_by'))} ${esc(verifiedBy||'________________')}</div>
-        </div>
-    </div>`;
-    console.log(container.innerHTML);
-    return container;
-}
 
 function printReport(){
     const layout=buildReportPrintLayout();
@@ -2771,7 +2674,7 @@ async function exportReportPDF() {
         page.style.display = "block";
         console.log("HTML:", page.innerHTML);
         const canvas = await html2canvas(page, {
-            scale: 2,
+        scale: window.devicePixelRatio * 2,     
             useCORS: true,
             backgroundColor: "#ffffff",
             scrollX: 0,
@@ -2800,16 +2703,9 @@ const imgData = croppedCanvas.toDataURL("image/jpeg", 1.0);
         });
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
-
         const ratio = croppedCanvas.width / croppedCanvas.height;
         let imgWidth = pageWidth;
         let imgHeight = imgWidth / ratio;
-
-        if (imgHeight > pageHeight) {
-            imgHeight = pageHeight;
-            imgWidth = imgHeight * ratio;
-        }
-
         console.log({
             canvasWidth: canvas.width,
             canvasHeight: canvas.height,
@@ -3183,6 +3079,7 @@ init();
 <script type="module" src="firebase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 </body>
