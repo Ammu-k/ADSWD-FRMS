@@ -281,10 +281,7 @@ tr:hover{background:rgba(13,148,136,.03)}
     .page{
         display:none!important;
     }
-    #page-reports,
-    #page-records{
-        display:block!important;
-    }
+
     .report-container{
         border:none!important;
         box-shadow:none!important;
@@ -371,7 +368,7 @@ tr:hover{background:rgba(13,148,136,.03)}
 }
 .print-report-page{
     width:190mm;
-    margin:10mm;
+    margin:12.7mm;
     display:inline-block;
     height:auto;
     overflow:visible;
