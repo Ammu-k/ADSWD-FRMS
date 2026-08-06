@@ -168,14 +168,6 @@ export function buildReportPrintLayout() {
 
     const container = document.createElement('div');
     container.className = 'print-report-layout';
-    container.style.position = "fixed";
-    container.style.left = "0";
-    container.style.top = "0";
-    container.style.visibility = "hidden";
-    container.style.pointerEvents = "none";
-    container.style.zIndex = "-1";
-    container.style.width = "1123px";
-    container.style.background = "#fff";
     container.innerHTML = `<div class="print-report-page">
         <div class="print-head">
             <div style="display:flex;align-items:center;gap:12px">
@@ -232,39 +224,33 @@ export async function exportReportPDF() {
         page.style.visibility = "visible";
         page.style.display = "block";
         const canvas = await html2canvas(page, {
-            scale: window.devicePixelRatio * 2,
+            scale: 2,
             useCORS: true,
             backgroundColor: "#ffffff",
             scrollX: 0,
-            scrollY: 0
+            scrollY: 0,
+            width: page.scrollWidth,
+            height: page.scrollHeight
         });
-        const contentHeight = page.scrollHeight;
-        const scale = canvas.height / page.offsetHeight;
-        const croppedCanvas = document.createElement("canvas");
-        croppedCanvas.width = canvas.width;
-        croppedCanvas.height = contentHeight * scale;
-        const ctx = croppedCanvas.getContext("2d");
-        ctx.drawImage(
-            canvas,
-            0, 0,
-            canvas.width, croppedCanvas.height,
-            0, 0,
-            canvas.width, croppedCanvas.height
-        );
-
-        const imgData = croppedCanvas.toDataURL("image/jpeg", 1.0);
+        const imgData = canvas.toDataURL("image/jpeg", 0.95);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({
-            orientation: "landscape",
+            orientation: "portrait",
             unit: "mm",
             format: "a4"
         });
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
-        const ratio = croppedCanvas.width / croppedCanvas.height;
-        let imgWidth = pageWidth;
+        const margin = 10;
+        const contentWidth = pageWidth - 2 * margin;
+        const ratio = canvas.width / canvas.height;
+        let imgWidth = contentWidth;
         let imgHeight = imgWidth / ratio;
-        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
+        if (imgHeight > pageHeight - 2 * margin) {
+            imgHeight = pageHeight - 2 * margin;
+            imgWidth = imgHeight * ratio;
+        }
+        pdf.addImage(imgData, "JPEG", margin, margin, imgWidth, imgHeight);
         pdf.save("ADSWD_Report.pdf");
     } catch (err) {
         console.error(err);

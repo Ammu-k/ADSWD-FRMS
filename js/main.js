@@ -60,8 +60,9 @@ function showApp() {
 
     api.filterRecords?.();
     api.updateDashboard?.();
-    api.generateReport?.();
     cashbook.populateMonthSelectors();
+    reports.populateReportSelectors();
+    api.generateReport?.();
     const backupCount = document.getElementById("backupRecordCount");
     if (backupCount)
         backupCount.textContent = state.records.length;
