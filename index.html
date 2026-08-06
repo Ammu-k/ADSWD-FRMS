@@ -33,7 +33,7 @@
 <div class="login-left-footer">Authorized personnel only. All actions are logged.</div>
 </div>
 <div class="login-right">
-<select class="login-lang-select" onchange="setLanguage(this.value)">
+<select class="login-lang-select" data-action="setLanguage">
     <option value="en" data-i18n="language.english">English</option>
     <option value="kn" data-i18n="language.kannada">à²•à²¨à³à²¨à²¡</option>
     <option value="hi" data-i18n="language.hindi">à¤¹à¤¿à¤¨à¥à¤¦à¥€</option>
@@ -50,13 +50,13 @@
     Access your department workspace.
 </p>
 <div class="login-tabs">
-<button class="login-tab active" onclick="switchLoginTab('signin')" id="tabSignin">Sign in</button>
-<button class="login-tab" onclick="switchLoginTab('signup')" id="tabSignup">Sign up</button>
+<button class="login-tab active" data-action="switchLoginTab" data-arg="signin" id="tabSignin">Sign in</button>
+<button class="login-tab" data-action="switchLoginTab" data-arg="signup" id="tabSignup">Sign up</button>
 </div>
 
 <!-- SIGN IN -->
 <div id="signinForm">
-<button class="google-btn" onclick="handleGoogleSignIn()">
+<button class="google-btn" data-action="handleGoogleSignIn">
 <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
 Continue with Google
 </button>
@@ -70,10 +70,10 @@ Continue with Google
 <label>Password</label>
 <input type="password" id="loginPass" placeholder="Enter password">
 </div>
-<button class="btn btn-primary btn-block" onclick="handleLogin()" style="background:#0d9488;padding:14px;font-size:15px">
+<button class="btn btn-primary btn-block" data-action="handleLogin" style="background:#0d9488;padding:14px;font-size:15px">
 Sign in
 </button>
-<p class="login-link"><a onclick="showForgot()">Forgot Password?</a></p>
+<p class="login-link"><a data-action="showForgot">Forgot Password?</a></p>
 </div>
 
 <!-- SIGN UP -->
@@ -94,7 +94,7 @@ Sign in
 <label>Confirm Password</label>
 <input type="password" id="signupConfirm" placeholder="Confirm password">
 </div>
-<button class="btn btn-primary btn-block" onclick="handleSignup()" style="background:#0d9488;padding:14px;font-size:15px">
+<button class="btn btn-primary btn-block" data-action="handleSignup" style="background:#0d9488;padding:14px;font-size:15px">
 Create Account
 </button>
 </div>
@@ -109,8 +109,8 @@ Create Account
 <label>New Password</label>
 <input type="password" id="forgotNewPass" placeholder="Enter new password">
 </div>
-<button class="btn btn-primary btn-block" onclick="handleForgot()" style="background:#0d9488">Reset Password</button>
-<p class="login-link"><a onclick="showLogin()">Back to Login</a></p>
+<button class="btn btn-primary btn-block" data-action="handleForgot" style="background:#0d9488">Reset Password</button>
+<p class="login-link"><a data-action="showLogin">Back to Login</a></p>
 </div>
 </div>
 </div>
@@ -128,19 +128,19 @@ Create Account
     </div>
 </div>
 <nav class="sidebar-nav" id="sidebarNav">
-<div class="nav-item active" onclick="navigateTo('dashboard')" data-page="dashboard">
+<div class="nav-item active" data-action="navigateTo" data-arg="dashboard" data-page="dashboard">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
 <span data-i18n="nav_dashboard">Dashboard</span>
 </div>
-<div class="nav-item" onclick="navigateTo('records')" data-page="records">
+<div class="nav-item" data-action="navigateTo" data-arg="records" data-page="records">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
 <span data-i18n="nav_records">Records</span>
 </div>
-<div class="nav-item" onclick="navigateTo('reports')" data-page="reports">
+<div class="nav-item" data-action="navigateTo" data-arg="reports" data-page="reports">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 118 2.83"/><path d="M22 12A10 10 0 0012 2v10z"/></svg>
 <span data-i18n="nav_reports">Reports</span>
 </div>
-<div class="nav-item" onclick="navigateTo('admin')" data-page="admin">
+<div class="nav-item" data-action="navigateTo" data-arg="admin" data-page="admin">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
 <span data-i18n="nav_admin">Admin</span>
 </div>
@@ -156,20 +156,20 @@ Create Account
 <div class="main-content">
 <div class="topbar">
 <div class="topbar-left">
-<button class="topbar-btn no-print" onclick="toggleSidebar()" id="menuToggle">
+<button class="topbar-btn no-print" data-action="toggleSidebar" id="menuToggle">
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
 <span id="topbarWelcome" style="font-size:14px;color:var(--text-light)" data-i18n="welcome_back">Welcome back</span></div>
 <div class="topbar-right">
-<select id="topbarLang" onchange="setLanguage(this.value)" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text);cursor:pointer">
+<select id="topbarLang" data-action="setLanguage" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text);cursor:pointer">
     <option value="en" data-i18n="language.english">English</option>
     <option value="kn" data-i18n="language.kannada">à²•à²¨à³à²¨à²¡</option>
     <option value="hi" data-i18n="language.hindi">à¤¹à¤¿à¤‚à¤¦à¥€</option>
 </select>
-<button class="topbar-btn" onclick="cycleTheme()" id="themeToggle" title="Toggle theme">
+<button class="topbar-btn" data-action="cycleTheme" id="themeToggle" title="Toggle theme">
 <span id="themeIcon"></span>
 </button>
-<button class="topbar-btn" onclick="handleLogout()" title="Sign out" style="gap:6px;width:auto;padding:8px 14px;font-size:13px;font-weight:500">
+<button class="topbar-btn" data-action="handleLogout" title="Sign out" style="gap:6px;width:auto;padding:8px 14px;font-size:13px;font-weight:500">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
 <span data-i18n="sign_out">Sign out</span></button>
 </div>
@@ -184,7 +184,7 @@ Create Account
 <h2 style="font-size:28px;font-weight:700" data-i18n="nav_dashboard">Dashboard</h2>
 <p style="font-size:14px;color:var(--text-light);margin-top:4px"data-i18n="dashboard_subtitle">ADSWD BIDAR Â· Financial Records</p>
 </div>
-<button class="btn btn-primary" onclick="navigateTo('cashbook')" style="background:#0d9488;padding:12px 20px;font-size:14px">+ <span data-i18n="nav_cashbook">Cash Book Entry</span></button>
+<button class="btn btn-primary" data-action="navigateTo" data-arg="cashbook" style="background:#0d9488;padding:12px 20px;font-size:14px">+ <span data-i18n="nav_cashbook">Cash Book Entry</span></button>
 </div>
 
 <div class="stats-grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
@@ -200,14 +200,14 @@ Create Account
 <span style="font-size:11px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:1px" data-i18n="month_total">MONTH'S TOTAL</span>
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-light)" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
 </div>
-<h3 id="statMonthTotal" class="amount" style="font-size:32px;font-weight:700">â‚¹0</h3>
+<h3 id="statMonthTotal" class="amount" style="font-size:32px;font-weight:700">₹0</h3>
 </div>
 <div class="stat-card">
 <div class="stat-card-header">
 <span style="font-size:11px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:1px" data-i18n="year_total">YEAR'S TOTAL</span>
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-light)" stroke-width="1.5"><polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/><polyline points="17,6 23,6 23,12"/></svg>
 </div>
-<h3 id="statYearTotal" class="amount" style="font-size:32px;font-weight:700">â‚¹0</h3>
+<h3 id="statYearTotal" class="amount" style="font-size:32px;font-weight:700">₹0</h3>
 </div>
 <div class="stat-card">
 <div class="stat-card-header">
@@ -231,7 +231,7 @@ Create Account
 <h2 data-i18n="cashbook_entry">CASH BOOK ENTRY</h2>
 <div class="month-row">
 <span data-i18n="bank_total">BANK TOTAL:</span>
-<span id="cbBankTotal">â‚¹0</span>
+<span id="cbBankTotal">₹0</span>
 </div>
 </div>
 <div class="cashbook-body">
@@ -261,11 +261,11 @@ Create Account
 </div>
 <div class="cashbook-field">
 <div class="cashbook-field-label" data-i18n="net_pay">Net Pay</div>
-<div class="cashbook-field-value"><input type="number" step="0.01" id="rcNetPay" placeholder="0" oninput="calcReceiptGross()"></div>
+<div class="cashbook-field-value"><input type="number" step="0.01" id="rcNetPay" placeholder="0" data-action="calcReceiptGross"></div>
 </div>
 <div class="cashbook-field">
 <div class="cashbook-field-label" data-i18n="deduction">Deduction</div>
-<div class="cashbook-field-value"><input type="number" step="0.01" id="rcDeduction" placeholder="0" oninput="calcReceiptGross()"></div>
+<div class="cashbook-field-value"><input type="number" step="0.01" id="rcDeduction" placeholder="0" data-action="calcReceiptGross"></div>
 </div>
 <div class="cashbook-field" style="border-bottom:none">
 <div class="cashbook-field-label" data-i18n="gross_amount">Gross Amount</div>
@@ -302,11 +302,11 @@ Create Account
 </div>
 <div class="cashbook-field">
 <div class="cashbook-field-label">Net Pay</div>
-<div class="cashbook-field-value"><input type="number" step="0.01" id="pmNetPay" placeholder="0" oninput="calcPaymentGross()"></div>
+<div class="cashbook-field-value"><input type="number" step="0.01" id="pmNetPay" placeholder="0" data-action="calcPaymentGross"></div>
 </div>
 <div class="cashbook-field">
 <div class="cashbook-field-label">Deduction</div>
-<div class="cashbook-field-value"><input type="number" step="0.01" id="pmDeduction" placeholder="0" oninput="calcPaymentGross()"></div>
+<div class="cashbook-field-value"><input type="number" step="0.01" id="pmDeduction" placeholder="0" data-action="calcPaymentGross"></div>
 </div>
 <div class="cashbook-field" style="border-bottom:none">
 <div class="cashbook-field-label">Gross Amount</div>
@@ -316,9 +316,9 @@ Create Account
 </div>
 </div>
 <div class="cashbook-actions">
-<button class="btn btn-success" onclick="saveCashBook()" data-i18n="save">SAVE</button>
-<button class="btn btn-accent" onclick="submitCashBook()" data-i18n="submit">SUBMIT</button>
-<button class="btn btn-outline" onclick="resetCashBook()" data-i18n="cancel">CANCEL</button>
+<button class="btn btn-success" data-action="saveCashBook" data-i18n="save">SAVE</button>
+<button class="btn btn-accent" data-action="submitCashBook" data-i18n="submit">SUBMIT</button>
+<button class="btn btn-outline" data-action="resetCashBook" data-i18n="cancel">CANCEL</button>
 </div>
 </div>
 
@@ -329,22 +329,22 @@ Create Account
 <p style="font-size:13px;color:var(--text-light)" id="recordsSubtitle">ADSWD Â· Financial Records</p>
 </div>
 <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-<button class="btn btn-outline btn-sm" onclick="navigateTo('import')">  <span data-i18n="nav_import">Import</span></button>
-<button class="btn btn-outline btn-sm" onclick="exportAllRecords()">  <span data-i18n="nav_export">Excel</span></button>
-<button class="btn btn-outline btn-sm" onclick="printReport()">  <span data-i18n="export_pdf">PDF</span></button>
+<button class="btn btn-outline btn-sm" data-action="navigateTo" data-arg="import">  <span data-i18n="nav_import">Import</span></button>
+<button class="btn btn-outline btn-sm" data-action="exportAllRecords">  <span data-i18n="nav_export">Excel</span></button>
+<button class="btn btn-outline btn-sm" data-action="printReport">  <span data-i18n="export_pdf">PDF</span></button>
 </div>
 <div class="table-wrapper">
 <div class="table-toolbar">
-<input type="text" id="recordSearch" placeholder="Search records..." data-i18n-placeholder="search_records" oninput="filterRecords()">
-<select id="recordTypeFilter" onchange="filterRecords()">
+<input type="text" id="recordSearch" placeholder="Search records..." data-i18n-placeholder="search_records" data-action="filterRecords">
+<select id="recordTypeFilter" data-action="filterRecords">
 <option value="" data-i18n="all_types">All Types</option>
 <option value="receipt" data-i18n="receipt">Receipt</option>
 <option value="payment" data-i18n="payment">Payment</option>
 </select>
-<select id="recordMonthFilter" onchange="filterRecords()">
+<select id="recordMonthFilter" data-action="filterRecords">
 <option value="" data-i18n="all_months">All Months</option>
 </select>
-<input type="month" id="recordDateFilter" onchange="filterRecords()">
+<input type="month" id="recordDateFilter" data-action="filterRecords">
 <div style="flex:1"></div>
 <span id="recordCount" style="font-size:12px;color:var(--text-light)"></span>
 </div>
@@ -370,22 +370,22 @@ Create Account
 <!-- REPORTS -->
 <div class="page" id="page-reports">
 <div class="no-print" style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center">
-<select id="reportMonth" onchange="generateReport()" style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text)">
+<select id="reportMonth" data-action="generateReport" style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text)">
 </select>
-<select id="reportYear" onchange="generateReport()" style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text)">
+<select id="reportYear" data-action="generateReport" style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text)">
 </select>
-<input type="date" id="reportDay" onchange="generateReport()" style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text)">
+<input type="date" id="reportDay" data-action="generateReport" style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text)">
 <button class="btn btn-sm btn-outline"
-        onclick="clearReportDay()"
+        data-action="clearReportDay"
         title="Show full month"
         data-i18n="all_days"
         style="font-size:12px">
     All Days
 </button>
 <div style="flex:1"></div>
-<button class="btn btn-sm btn-primary" onclick="printReport()" data-i18n="print">  Print</button>
-<button class="btn btn-sm btn-success" onclick="exportReportPDF()" data-i18n="export_pdf">  Export PDF</button>
-<button class="btn btn-sm btn-accent" onclick="exportReportExcel()" data-i18n="export_excel">  Export Excel</button>
+<button class="btn btn-sm btn-primary" data-action="printReport" data-i18n="print">  Print</button>
+<button class="btn btn-sm btn-success" data-action="exportReportPDF" data-i18n="export_pdf">  Export PDF</button>
+<button class="btn btn-sm btn-accent" data-action="exportReportExcel" data-i18n="export_excel">  Export Excel</button>
 </div>
 <div class="report-container" id="reportContainer">
 <div class="report-header">
@@ -408,15 +408,15 @@ Create Account
 <div class="report-totals">
 <div class="total-section receipts-tot">
 <div style="font-weight:700;margin-bottom:8px">RECEIPTS / <span class="kannada-text">à²¸à³à²µà³€à²•à³ƒà²¤à²¿à²—à²³à³</span></div>
-<div class="total-row"><span>NET AMOUNT</span><span id="rptReceiptNet">â‚¹0</span></div>
-<div class="total-row"><span>DEDUCTION</span><span id="rptReceiptDed">â‚¹0</span></div>
-<div class="total-row grand"><span data-i18n="grand_total">GRAND TOTAL</span><span id="rptReceiptGrand">â‚¹0</span></div>
+<div class="total-row"><span>NET AMOUNT</span><span id="rptReceiptNet">₹0</span></div>
+<div class="total-row"><span>DEDUCTION</span><span id="rptReceiptDed">₹0</span></div>
+<div class="total-row grand"><span data-i18n="grand_total">GRAND TOTAL</span><span id="rptReceiptGrand">₹0</span></div>
 </div>
 <div class="total-section payments-tot">
 <div style="font-weight:700;margin-bottom:8px">PAYMENTS / <span class="kannada-text">à²¸à²‚à²¦à²¾à²¯à²—à²³à³</span></div>
-<div class="total-row"><span>NET AMOUNT</span><span id="rptPaymentNet">â‚¹0</span></div>
-<div class="total-row"><span>DEDUCTION</span><span id="rptPaymentDed">â‚¹0</span></div>
-<div class="total-row grand"><span data-i18n="grand_total">GRAND TOTAL</span><span id="rptPaymentGrand">â‚¹0</span></div>
+<div class="total-row"><span>NET AMOUNT</span><span id="rptPaymentNet">₹0</span></div>
+<div class="total-row"><span>DEDUCTION</span><span id="rptPaymentDed">₹0</span></div>
+<div class="total-row grand"><span data-i18n="grand_total">GRAND TOTAL</span><span id="rptPaymentGrand">₹0</span></div>
 </div>
 </div>
 <div class="report-body">
@@ -466,8 +466,8 @@ Create Account
 <div class="page" id="page-import">
 <div class="table-wrapper" style="padding:24px">
 <h3 style="border:none;padding:0 0 16px" data-i18n="import_excel">Import Excel</h3>
-<div class="import-zone" id="importZone" onclick="document.getElementById('importFile').click()">
-<input type="file" id="importFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleImport(event)">
+<div class="import-zone" id="importZone" data-action="pickFile" data-arg="importFile">
+<input type="file" id="importFile" accept=".xlsx,.xls,.csv" style="display:none" data-action="handleImport">
 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-light)" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="13" x2="12" y2="3"/></svg>
 <p style="margin-top:12px;font-size:14px;color:var(--text-light)" data-i18n="drop_or_click">Drag & drop your Excel file here or click to browse</p>
 <p style="margin-top:4px;font-size:12px;color:var(--text-light)" data-i18n="supported_formats">Supports .xlsx, .xls, .csv</p>
@@ -476,8 +476,8 @@ Create Account
 <h4 style="margin-bottom:12px" data-i18n="preview_data">Preview Data</h4>
 <div style="overflow-x:auto;margin-bottom:16px" id="importPreviewTable"></div>
 <div style="display:flex;gap:12px">
-<button class="btn btn-success" onclick="confirmImport()" data-i18n="confirm_import">Confirm Import</button>
-<button class="btn btn-outline" onclick="cancelImport()" data-i18n="cancel">Cancel</button>
+<button class="btn btn-success" data-action="confirmImport" data-i18n="confirm_import">Confirm Import</button>
+<button class="btn btn-outline" data-action="cancelImport" data-i18n="cancel">Cancel</button>
 </div>
 </div>
 <div id="importResult" style="display:none;margin-top:16px"></div>
@@ -489,12 +489,12 @@ Create Account
 <div class="table-wrapper" style="padding:24px">
 <h3 style="border:none;padding:0 0 16px" data-i18n="export_excel">Export Excel</h3>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:600px">
-<div class="backup-card" onclick="exportAllRecords()">
+<div class="backup-card" data-action="exportAllRecords">
 <div style="font-size:32px;margin-bottom:8px"> </div>
 <h4 data-i18n="export_all">Export All Records</h4>
 <p style="font-size:12px;color:var(--text-light);margin-top:4px" data-i18n="export_all_desc">Download complete cash book data</p>
 </div>
-<div class="backup-card" onclick="exportMonthlyReport()">
+<div class="backup-card" data-action="exportMonthlyReport">
 <div style="font-size:32px;margin-bottom:8px"> </div>
 <h4 data-i18n="export_monthly">Export Monthly Report</h4>
 <p style="font-size:12px;color:var(--text-light);margin-top:4px" data-i18n="export_monthly_desc">Download current month report</p>
@@ -509,16 +509,16 @@ Create Account
 <div class="settings-card">
 <h3 data-i18n="backup">Backup & Restore</h3>
 <div class="backup-options">
-<div class="backup-card" onclick="createBackup()">
+<div class="backup-card" data-action="createBackup">
 <div style="font-size:32px;margin-bottom:8px"> Ã¯Â¸Â</div>
 <h4 data-i18n="create_backup">Create Backup</h4>
 <p style="font-size:12px;color:var(--text-light);margin-top:4px" data-i18n="backup_desc">Download all data as JSON file</p>
 </div>
-<div class="backup-card" onclick="document.getElementById('restoreFile').click()">
+<div class="backup-card" data-action="pickFile" data-arg="restoreFile">
 <div style="font-size:32px;margin-bottom:8px"> </div>
 <h4 data-i18n="restore_backup">Restore Backup</h4>
 <p style="font-size:12px;color:var(--text-light);margin-top:4px" data-i18n="restore_desc">Import data from backup file</p>
-<input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreBackup(event)">
+<input type="file" id="restoreFile" accept=".json" style="display:none" data-action="restoreBackup">
 </div>
 </div>
 </div>
@@ -526,7 +526,7 @@ Create Account
 <h3 data-i18n="data_management">Data Management</h3>
 <p style="font-size:13px;color:var(--text-light);margin-bottom:16px" data-i18n="current_records">Current Records:</p>
 <p style="font-size:24px;font-weight:700;margin-bottom:16px" id="backupRecordCount">0</p>
-<button class="btn btn-danger btn-sm" onclick="clearAllData()" data-i18n="clear_all">Clear All Data</button>
+<button class="btn btn-danger btn-sm" data-action="clearAllData" data-i18n="clear_all">Clear All Data</button>
 </div>
 </div>
 </div>
@@ -539,10 +539,10 @@ Create Account
 </div>
 
 <div class="admin-tabs" style="display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--border)">
-<button class="admin-tab active" onclick="switchAdminTab('users')" style="padding:10px 20px;font-size:14px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text-light);transition:.2s">Users</button>
-<button class="admin-tab" onclick="switchAdminTab('schemes')" style="padding:10px 20px;font-size:14px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text-light);transition:.2s">Schemes</button>
-<button class="admin-tab" onclick="switchAdminTab('backup')" style="padding:10px 20px;font-size:14px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text-light);transition:.2s">Backup</button>
-<button class="admin-tab" onclick="switchAdminTab('settings')" style="padding:10px 20px;font-size:14px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text-light);transition:.2s">Settings</button>
+<button class="admin-tab active" data-action="switchAdminTab" data-arg="users" style="padding:10px 20px;font-size:14px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text-light);transition:.2s">Users</button>
+<button class="admin-tab" data-action="switchAdminTab" data-arg="schemes" style="padding:10px 20px;font-size:14px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text-light);transition:.2s">Schemes</button>
+<button class="admin-tab" data-action="switchAdminTab" data-arg="backup" style="padding:10px 20px;font-size:14px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text-light);transition:.2s">Backup</button>
+<button class="admin-tab" data-action="switchAdminTab" data-arg="settings" style="padding:10px 20px;font-size:14px;font-weight:500;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--text-light);transition:.2s">Settings</button>
 </div>
 
 <!-- USERS TAB -->
@@ -571,12 +571,12 @@ Create Account
 <div id="schemesList" style="display:grid;gap:12px"></div>
 <div id="addSchemeForm" style="display:none;margin-top:16px;padding:16px;border:1px solid var(--border);border-radius:8px">
   <div style="display:flex;gap:8px;align-items:center">
-    <input type="text" id="schemeNameInput" placeholder="Enter scheme name" data-i18n-placeholder="enter_scheme_name" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px;background:var(--card);color:var(--text)" onkeydown="if(event.key==='Enter')saveScheme()">
-    <button class="btn btn-sm btn-success" onclick="saveScheme()" data-i18n="save">Save</button>
-    <button class="btn btn-sm btn-outline" onclick="cancelAddScheme()" data-i18n="cancel">Cancel</button>
+    <input type="text" id="schemeNameInput" placeholder="Enter scheme name" data-i18n-placeholder="enter_scheme_name" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px;background:var(--card);color:var(--text)" data-action="saveScheme">
+    <button class="btn btn-sm btn-success" data-action="saveScheme" data-i18n="save">Save</button>
+    <button class="btn btn-sm btn-outline" data-action="cancelAddScheme" data-i18n="cancel">Cancel</button>
   </div>
 </div>
-<button class="btn btn-outline" onclick="showAddSchemeForm()" style="margin-top:16px" data-i18n="add_scheme">+ Add Scheme</button>
+<button class="btn btn-outline" data-action="showAddSchemeForm" style="margin-top:16px" data-i18n="add_scheme">+ Add Scheme</button>
 </div>
 </div>
 
@@ -585,20 +585,20 @@ Create Account
 <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:24px">
 <h3 style="font-size:18px;font-weight:700;margin-bottom:20px" data-i18n="backup_restore">Backup & Restore</h3>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div onclick="createBackup()" style="padding:24px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+<div data-action="createBackup" class="card-hover" style="padding:24px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:.2s">
 <div style="font-size:32px;margin-bottom:12px"> Ã¯Â¸Â</div>
 <h4 style="font-size:16px;font-weight:600;margin-bottom:4px" data-i18n="create_backup">Create Backup</h4>
 <p style="font-size:13px;color:var(--text-light)" data-i18n="download_json_backup">Download all data as JSON file</p>
 </div>
-<div onclick="document.getElementById('restoreFile').click()" style="padding:24px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:.2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+<div data-action="pickFile" data-arg="restoreFile" class="card-hover" style="padding:24px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:.2s">
 <div style="font-size:32px;margin-bottom:12px"> </div>
 <h4 style="font-size:16px;font-weight:600;margin-bottom:4px" data-i18n="restore_backup">Restore Backup</h4>
 <p style="font-size:13px;color:var(--text-light)" data-i18n="import_backup_file">Import data from backup file</p>
-<input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreBackup(event)">
+<input type="file" id="restoreFile" accept=".json" style="display:none" data-action="restoreBackup">
 </div>
 </div>
 <p style="margin-top:16px;font-size:13px;color:var(--text-light)" data-i18n="current_records">Current Records: <strong id="backupRecordCount">0</strong></p>
-<button class="btn btn-danger btn-sm" onclick="clearAllData()" style="margin-top:12px" data-i18n="clear_all_data">Clear All Data</button>
+<button class="btn btn-danger btn-sm" data-action="clearAllData" style="margin-top:12px" data-i18n="clear_all_data">Clear All Data</button>
 </div>
 </div>
 
@@ -615,121 +615,12 @@ Create Account
 <label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:var(--text-light)" data-i18n="financial_year">Financial Year</label>
 <input type="text" id="settingFinYear" value="2026-2027" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:6px;font-size:14px;background:var(--bg);color:var(--text)">
 </div>
-<button class="btn btn-primary" onclick="saveSettings()" style="justify-content:center;margin-top:8px" data-i18n="save_settings">Save Settings</button>
+<button class="btn btn-primary" data-action="saveSettings" style="justify-content:center;margin-top:8px" data-i18n="save_settings">Save Settings</button>
 </div>
 </div>
 </div>
 
-<script>
-function switchAdminTab(tab){
-  document.querySelectorAll('.admin-tab').forEach(t=>{t.classList.remove('active');t.style.borderBottomColor='transparent';t.style.color='var(--text-light)'});
-  document.querySelectorAll('.admin-tab-content').forEach(c=>c.style.display='none');
-  const tabs=document.querySelectorAll('.admin-tab');
-  const idx=tab==='users'?0:tab==='schemes'?1:tab==='backup'?2:3;
-  tabs[idx].classList.add('active');
-  tabs[idx].style.borderBottomColor='var(--primary)';
-  tabs[idx].style.color='var(--text)';
-  document.getElementById('adminTab'+tab.charAt(0).toUpperCase()+tab.slice(1)).style.display='block';
-}
 
-function renderAdminUsers() {
-  const users = JSON.parse(localStorage.getItem(window.APP_KEY + '_users') || '{}');
-  const tbody = document.getElementById('adminUsersBody');
-  if (!tbody) return;
-  tbody.innerHTML = Object.entries(users).map(([username, u]) => {
-    const role = u.role || t('role_staff');
-    const isAdmin = role === 'admin';
-    return `
-      <tr style="border-bottom:1px solid var(--border)">
-        <td style="padding:16px;font-size:14px;font-weight:500">
-          <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--bg);margin-right:12px;font-size:14px">
-            ${(u.name || username).charAt(0).toUpperCase()}
-          </span>
-          ${esc(u.name || username)}
-        </td>
-        <td style="padding:16px;font-size:14px;color:var(--text-light)">
-          ${esc(username)}
-        </td>
-        <td style="padding:16px">
-          <span style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;${isAdmin ? 'background:#0d9488;color:#fff' : 'background:var(--bg);color:var(--text)'}">
-            ${role}
-          </span>
-        </td>
-        <td style="padding:16px;font-size:13px;color:var(--text-light)">
-          ${u.joined || 'â€”'}
-        </td>
-        <td style="padding:16px;text-align:right">
-          ${
-            username !== 'admin'
-              ? `<button class="btn btn-sm btn-outline" onclick="toggleAdminRole('${username}')">
-                  ${isAdmin ? window.t('revoke_admin') : window.t('make_admin')}
-                 </button>`
-              : ''
-          }
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function toggleAdminRole(username){
-  const users=JSON.parse(localStorage.getItem(APP_KEY+'_users')||'{}');
-  if(!users[username])return;
-  users[username].role=users[username].role==='admin'?t('staff'):t('admin');
-  localStorage.setItem(APP_KEY+'_users',JSON.stringify(users));
-  renderAdminUsers();
-}
-
-function addScheme(){
-  const name=prompt(t('enter_scheme_name'));
-  if(!name)return;
-  const schemes=JSON.parse(localStorage.getItem(APP_KEY+'_schemes')||'[]');
-  schemes.push({name,created:new Date().toLocaleDateString('en-IN')});
-  localStorage.setItem(APP_KEY+'_schemes',JSON.stringify(schemes));
-  renderSchemes();
-}
-function showAddSchemeForm(){
-  document.getElementById('addSchemeForm').style.display='block';
-  document.getElementById('schemeNameInput').value='';
-  document.getElementById('schemeNameInput').focus();
-}
-function saveScheme(){
-  const name=document.getElementById('schemeNameInput').value.trim();
-  if(!name){window.toast(window.t('please_enter_scheme_name'),'error');return;}
-  const schemes=JSON.parse(localStorage.getItem(APP_KEY+'_schemes')||'[]');
-  schemes.push({name,created:new Date().toLocaleDateString('en-IN')});
-  localStorage.setItem(APP_KEY+'_schemes',JSON.stringify(schemes));
-  document.getElementById('addSchemeForm').style.display='none';
-  renderSchemes();
-  window.toast(window.t('scheme_added'),'success');
-}
-function cancelAddScheme(){
-  document.getElementById('addSchemeForm').style.display='none';
-}
-
-function renderSchemes(){
-  const schemes=JSON.parse(localStorage.getItem(APP_KEY+'_schemes')||'[]');
-  const container=document.getElementById('schemesList');
-  if(!container)return;
-  container.innerHTML=schemes.length?schemes.map((s,i)=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;border:1px solid var(--border);border-radius:8px">
-      <div>
-        <div style="font-weight:500">${esc(s.name)}</div>
-        <div style="font-size:12px;color:var(--text-light)">${t('created')}: ${s.created||'â€”'}</div>
-      </div>
-      <button class="btn btn-sm btn-danger" onclick="deleteScheme(${i})">${t('delete')}</button>
-    </div>
-  `).join('') : `<p style="color:var(--text-light);font-size:14px;text-align:center;padding:20px">${t('no_schemes_added')}</p>`;
-}
-
-function deleteScheme(index){
-  if(!confirm(t('delete_scheme_confirm')))return;
-  const schemes=JSON.parse(localStorage.getItem(APP_KEY+'_schemes')||'[]');
-  schemes.splice(index,1);
-  localStorage.setItem(APP_KEY+'_schemes',JSON.stringify(schemes));
-  renderSchemes();
-}
-</script>
 </div>
 
 <!-- LANGUAGE -->
@@ -739,15 +630,15 @@ function deleteScheme(index){
 <p style="font-size:13px;color:var(--text-light);margin-bottom:20px" data-i18n="language_desc">Select your preferred language for the application interface.</p>
 <div style="display:grid;gap:12px">
 <label style="display:flex;align-items:center;gap:12px;padding:16px;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:.2s" class="lang-option" data-lang="en">
-<input type="radio" name="lang" value="en" onchange="setLanguage('en')">
+<input type="radio" name="lang" value="en" data-action="setLanguage">
 <div><strong data-i18n="english">English</strong><br><span style="font-size:12px;color:var(--text-light)" data-i18n="default_language">Default language</span></div>
 </label>
 <label style="display:flex;align-items:center;gap:12px;padding:16px;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:.2s" class="lang-option" data-lang="kn">
-<input type="radio" name="lang" value="kn" onchange="setLanguage('kn')">
+<input type="radio" name="lang" value="kn" data-action="setLanguage">
 <div><strong class="kannada-text" data-i18n="kannada">à²•à²¨à³à²¨à²¡</strong><br><span style="font-size:12px;color:var(--text-light)" data-i18n="kannada_desc">Kannada - à²•à²¨à³à²¨à²¡ à²­à²¾à²·à³†</span></div>
 </label>
 <label style="display:flex;align-items:center;gap:12px;padding:16px;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:.2s" class="lang-option" data-lang="hi">
-<input type="radio" name="lang" value="hi" onchange="setLanguage('hi')">
+<input type="radio" name="lang" value="hi" data-action="setLanguage">
 <div><strong data-i18n="hindi">à¤¹à¤¿à¤¨à¥à¤¦à¥€</strong><br><span style="font-size:12px;color:var(--text-light)" data-i18n="hindi_desc">Hindi - à¤¹à¤¿à¤¨à¥à¤¦à¥€ à¤­à¤¾à¤·à¤¾</span></div>
 </label>
 </div>
@@ -763,7 +654,7 @@ function deleteScheme(index){
 <div class="modal">
 <div class="modal-header">
 <h3 data-i18n="edit_record">Edit Record</h3>
-<button class="modal-close" onclick="closeEditModal()">Ãƒâ€”</button>
+<button class="modal-close" data-action="closeEditModal">Ãƒâ€”</button>
 </div>
 <div class="modal-body">
 <input type="hidden" id="editId">
@@ -804,8 +695,8 @@ function deleteScheme(index){
 </div>
 </div>
 <div class="modal-footer">
-<button class="btn btn-outline" onclick="closeEditModal()" data-i18n="cancel">Cancel</button>
-<button class="btn btn-primary" onclick="saveEdit()" data-i18n="save_changes">Save Changes</button>
+<button class="btn btn-outline" data-action="closeEditModal" data-i18n="cancel">Cancel</button>
+<button class="btn btn-primary" data-action="saveEdit" data-i18n="save_changes">Save Changes</button>
 </div>
 </div>
 </div>
@@ -815,13 +706,13 @@ function deleteScheme(index){
 <div class="modal" style="max-width:400px">
 <div class="modal-header">
 <h3 data-i18n="confirm">Confirm</h3>
-<button class="modal-close" onclick="closeConfirmModal()">Ãƒâ€”</button>
+<button class="modal-close" data-action="closeConfirmModal">Ãƒâ€”</button>
 </div>
 <div class="modal-body">
 <p id="confirmMessage"></p>
 </div>
 <div class="modal-footer">
-<button class="btn btn-outline" onclick="closeConfirmModal()" data-i18n="cancel">Cancel</button>
+<button class="btn btn-outline" data-action="closeConfirmModal" data-i18n="cancel">Cancel</button>
 <button class="btn btn-danger" id="confirmAction" data-i18n="confirm">Confirm</button>
 </div>
 </div>

@@ -374,3 +374,7 @@ tr:hover{background:rgba(13,148,136,.03)}
 .stats-grid{grid-template-columns:1fr}
 .login-left-content h1{font-size:20px}
 }
+
+/* HOVER CARDS (replaces old onmouseover/onmouseout handlers) */
+.card-hover{border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:.2s}
+.card-hover:hover{border-color:var(--primary)}
