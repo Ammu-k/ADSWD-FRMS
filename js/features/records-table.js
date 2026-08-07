@@ -6,6 +6,7 @@ import { toast } from "../ui/toast.js";
 import { state } from "../services/app-state.js";
 import { api } from "../services/registry.js";
 import { updateRecordInFirestore, deleteRecordFromFirestore, handleFirestoreError } from "../services/records-service.js";
+import { openPrintWindow } from "./print-report.js";
 
 export function filterRecords() {
     const search = (document.getElementById('recordSearch').value || '').toLowerCase();
@@ -172,49 +173,16 @@ function getFilteredRecords() {
 
 export function printRecordsTable() {
     const records = getFilteredRecords();
-    const totalAmt = records.reduce((s, r) => s + (parseFloat(r.grossAmount) || 0), 0);
-    const container = document.createElement('div');
-    container.className = 'print-report-layout';
-    container.innerHTML = `<div class="print-report-page" style="padding:10mm">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-            <div>
-                <div style="font-size:18px;font-weight:700;letter-spacing:1px;text-transform:uppercase">${esc(t('nav_records'))}</div>
-                <div style="font-size:12px;color:#4b5563;margin-top:4px">${records.length} ${t('records')} · ₹${totalAmt.toLocaleString('en-IN')}</div>
-            </div>
-            <div style="font-size:12px;color:#4b5563">${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
-        </div>
-        <table style="width:100%;border-collapse:collapse;font-size:10px">
-            <thead>
-                <tr>
-                    <th style="border:1px solid #d1d5db;padding:6px 8px;background:#f3f4f6;font-weight:700;text-align:left">${t('date')}</th>
-                    <th style="border:1px solid #d1d5db;padding:6px 8px;background:#f3f4f6;font-weight:700;text-align:left">${t('type')}</th>
-                    <th style="border:1px solid #d1d5db;padding:6px 8px;background:#f3f4f6;font-weight:700;text-align:left">${t('receipt_no')}</th>
-                    <th style="border:1px solid #d1d5db;padding:6px 8px;background:#f3f4f6;font-weight:700;text-align:left">${t('particulars')}</th>
-                    <th style="border:1px solid #d1d5db;padding:6px 8px;background:#f3f4f6;font-weight:700;text-align:left">${t('beneficiary')}</th>
-                    <th style="border:1px solid #d1d5db;padding:6px 8px;background:#f3f4f6;font-weight:700;text-align:right">${t('net_pay')}</th>
-                    <th style="border:1px solid #d1d5db;padding:6px 8px;background:#f3f4f6;font-weight:700;text-align:right">${t('deduction')}</th>
-                    <th style="border:1px solid #d1d5db;padding:6px 8px;background:#f3f4f6;font-weight:700;text-align:right">${t('gross_amount')}</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${records.length ? records.map(r => `<tr>
-                    <td style="border:1px solid #d1d5db;padding:6px 8px">${formatDate(r.date)}</td>
-                    <td style="border:1px solid #d1d5db;padding:6px 8px"><span class="badge ${r.type === 'receipt' ? 'badge-success' : 'badge-danger'}" style="border:1px solid ${r.type === 'receipt' ? '#86efac' : '#fca5a5'};background:${r.type === 'receipt' ? '#d1fae5' : '#fee2e2'};color:${r.type === 'receipt' ? '#065f46' : '#991b1b'};padding:2px 6px;border-radius:4px;font-size:10px">${t(r.type)}</span></td>
-                    <td style="border:1px solid #d1d5db;padding:6px 8px">${esc(r.receiptNo || '-')}</td>
-                    <td style="border:1px solid #d1d5db;padding:6px 8px">${esc(r.particulars || '-')}</td>
-                    <td style="border:1px solid #d1d5db;padding:6px 8px">${esc(r.beneficiary || '-')}</td>
-                    <td style="border:1px solid #d1d5db;padding:6px 8px;text-align:right">₹${parseFloat(r.netPay || 0).toLocaleString('en-IN')}</td>
-                    <td style="border:1px solid #d1d5db;padding:6px 8px;text-align:right">₹${parseFloat(r.deduction || 0).toLocaleString('en-IN')}</td>
-                    <td style="border:1px solid #d1d5db;padding:6px 8px;text-align:right">₹${parseFloat(r.grossAmount || 0).toLocaleString('en-IN')}</td>
-                </tr>`).join('') : `<tr><td colspan="8" style="border:1px solid #d1d5db;padding:20px;text-align:center;color:#6b7280">${t('no_records_found')}</td></tr>`}
-            </tbody>
-        </table>
-    </div>`;
-    document.body.appendChild(container);
-    setTimeout(() => {
-        window.print();
-        setTimeout(() => container.remove(), 500);
-    }, 150);
+    const finYear = document.getElementById('settingFinYear')?.value || '';
+    openPrintWindow({
+        title: t('nav_records'),
+        dept: (document.getElementById('settingDeptName')?.value) || t('default_department'),
+        period: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }),
+        finYear,
+        records,
+        preparedBy: '',
+        verifiedBy: ''
+    });
 }
 
 api.filterRecords = filterRecords;
