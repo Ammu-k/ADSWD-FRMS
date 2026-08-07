@@ -35,7 +35,6 @@ const clickHandlers = {
     printReport: () => reports.printReport(),
     exportReportPDF: () => reports.exportReportPDF(),
     exportReportExcel: () => reports.exportReportExcel(),
-    printRecords: () => recordsTable.printRecordsTable(),
     confirmImport: () => importExport.confirmImport(),
     cancelImport: () => importExport.cancelImport(),
     exportAllRecords: () => importExport.exportAllRecords(),

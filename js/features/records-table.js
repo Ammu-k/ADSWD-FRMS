@@ -6,7 +6,6 @@ import { toast } from "../ui/toast.js";
 import { state } from "../services/app-state.js";
 import { api } from "../services/registry.js";
 import { updateRecordInFirestore, deleteRecordFromFirestore, handleFirestoreError } from "../services/records-service.js";
-import { openPrintWindow } from "./print-report.js";
 
 export function filterRecords() {
     const search = (document.getElementById('recordSearch').value || '').toLowerCase();
@@ -169,20 +168,6 @@ function getFilteredRecords() {
     });
 
     return filtered;
-}
-
-export function printRecordsTable() {
-    const records = getFilteredRecords();
-    const finYear = document.getElementById('settingFinYear')?.value || '';
-    openPrintWindow({
-        title: t('nav_records'),
-        dept: (document.getElementById('settingDeptName')?.value) || t('default_department'),
-        period: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }),
-        finYear,
-        records,
-        preparedBy: '',
-        verifiedBy: ''
-    });
 }
 
 api.filterRecords = filterRecords;
