@@ -1,4 +1,4 @@
-﻿// i18n.js - Language state, translations, and DOM translation pass.
+// i18n.js - Language state, translations, and DOM translation pass.
 const STORAGE_KEY = 'sw-frms_lang';
 let currentLang = 'en';
 
@@ -62,8 +62,11 @@ english:'English',
 default_language:'Default language',
 kannada:'Kannada',
 kannada_desc:'Kannada - ಕನ್ನಡ ಭಾಷೆ',
+<<<<<<< HEAD
 hindi:'हिन्दी',
 hindi_desc:'Hindi - हिन्दी भाषा',
+=======
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 enter_receipt_number:'Enter receipt number',
 enter_particulars:'Enter particulars',
 enter_beneficiary:'Enter beneficiary',
@@ -135,7 +138,18 @@ restored:'Restored',
 invalid_backup_file:'Invalid backup file!',
 delete_all_records_confirm:'Are you sure you want to delete ALL records? This cannot be undone!',
 all_data_cleared:'All data cleared!',
-settings_saved:'Settings saved!'
+settings_saved:'Settings saved!',
+app_name:'Financial Records Management System',
+dashboard_subtitle:'ADSWD BIDAR · Financial Records',
+cashbook_entry:'Cash Book Entry',
+import_excel:'Import Excel',
+clear_all:'Clear All',
+add_scheme:'Add Scheme',
+all_days:'All Days',
+month_total:'Month Total',
+year_total:'Year Total',
+sign_out:'Sign out',
+backup:'Backup & Restore'
 },
 
 kn: {
@@ -180,7 +194,11 @@ actions:'ಕ್ರಿಯೆಗಳು',
 search_records:'ದಾಖಲೆಗಳನ್ನು ಹುಡುಕಿ...',
 all_types:'ಎಲ್ಲಾ ಪ್ರಕಾರಗಳು',
 receipt:'ಸ್ವೀಕೃತಿ',
+<<<<<<< HEAD
 payment:'à²ªà²¾à²µà²¤à²¿',
+=======
+payment:'ಪಾವತಿ',
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 all_months:'ಎಲ್ಲಾ ತಿಂಗಳುಗಳು',
 print:'ಮುದ್ರಿಸಿ',
 export_pdf:'PDF ರಫ್ತು',
@@ -189,8 +207,13 @@ bank_total:'ಬ್ಯಾಂಕ್ ಒಟ್ಟು',
 grand_total:'ಒಟ್ಟು ಮೊತ್ತ',
 cash_book:'ನಗದು ಪುಸ್ತಕ',
 month_label:'ತಿಂಗಳು',
+<<<<<<< HEAD
 verified_by:'ಪರಿಶೀಲಿಸಿದವರು:',
 prepared_by:'ತಯಾರಿಸಿದವರು:',
+=======
+verified_by:'ಪರಿಶೀಲಿಸಿದವರು: ',
+prepared_by:'ತಯಾರಿಸಿದವರು: ',
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 drop_or_click:'ನಿಮ್ಮ Excel ಫೈಲ್ ಅನ್ನು ಇಲ್ಲಿ ಎಳೆದು ಬಿಡಿ ಅಥವಾ ಬ್ರೌಸ್ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ',
 supported_formats:'ಬೆಂಬಲಿತ ಸ್ವರೂಪಗಳು: .xlsx, .xls, .csv',
 preview_data:'ಡೇಟಾ ಪೂರ್ವವೀಕ್ಷಣೆ',
@@ -216,11 +239,16 @@ new_password:'ಹೊಸ ಪಾಸ್‌ವರ್ಡ್',
 confirm_password:'ಪಾಸ್‌ವರ್ಡ್ ದೃಢೀಕರಿಸಿ',
 update_password:'ಪಾಸ್‌ವರ್ಡ್ ನವೀಕರಿಸಿ',
 language_settings:'ಭಾಷೆ ಸೆಟ್ಟಿಂಗ್‌ಗಳು',
+<<<<<<< HEAD
 language_desc:'ಅಪ್ಲಿಕೇಶನ್‌ನ ಇಂಟರ್‌ಫೇಸ್‌ಗಾಗಿ ನಿಮ್ಮ ಆದ್ಯತೆಯ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
+=======
+language_desc:'ಅಪ್ಲಿಕೇಶನ್ ಇಂಟರ್ಫೇಸ್‌ಗಾಗಿ ನಿಮ್ಮ ಆದ್ಯತೆಯ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.',
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 login_username:'ಬಳಕೆದಾರ ಹೆಸರು',
 login_password:'ಪಾಸ್‌ವರ್ಡ್',
 login_btn:'ಸೈನ್ ಇನ್',
 forgot_password:'ಪಾಸ್‌ವರ್ಡ್ ಮರೆತಿರಾ?',
+<<<<<<< HEAD
 login_title: "ಸೈನ್ ಇನ್",
 login_subtitle: "ನಿಮ್ಮ ಇಲಾಖೆಯ ಕಾರ್ಯಕ್ಷೇತ್ರವನ್ನು ಪ್ರವೇಶಿಸಿ.",
 google_signin: "Google ಮೂಲಕ ಮುಂದುವರಿಸಿ",
@@ -230,6 +258,17 @@ password: "ಪಾಸ್‌ವರ್ಡ್",
 password_placeholder: "ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ",
 signup_title: "ಸೈನ್ ಅಪ್",
 reset_password:'ಪಾಸ್‌ವರ್ಡ್ ಮರುಹೊಂದಿಸಿ',
+=======
+login_title:'ಸೈನ್ ಇನ್',
+login_subtitle:'ನಿಮ್ಮ ಇಲಾಖೆಯ ಕಾರ್ಯಕ್ಷೇತ್ರವನ್ನು ಪ್ರವೇಶಿಸಿ.',
+google_signin:'Google ಮೂಲಕ ಮುಂದುವರಿಸಿ',
+or_email:'ಅಥವಾ ಈಮೇಲ್ ಬಳಸಿ',
+email:'ಈಮೇಲ್',
+password:'ಪಾಸ್‌ವರ್ಡ್',
+password_placeholder:'ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ',
+signup_title:'ಸೈನ್ ಅಪ್',
+reset_password:'ಪಾಸ್‌ವರ್ಡ್ ರೀಸೆಟ್ ಮಾಡಿ',
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 back_to_login:'ಲಾಗಿನ್‌ಗೆ ಹಿಂತಿರುಗಿ',
 username:'ಬಳಕೆದಾರ ಹೆಸರು',
 role_admin:'ನಿರ್ವಾಹಕ',
@@ -253,8 +292,13 @@ scheme_added:'ಯೋಜನೆಯನ್ನು ಸೇರಿಸಲಾಗಿದೆ!'
 created:'ರಚಿಸಿದ ದಿನಾಂಕ',
 delete:'ಅಳಿಸಿ',
 no_schemes_added:'ಯಾವುದೇ ಯೋಜನೆಗಳನ್ನು ಇನ್ನೂ ಸೇರಿಸಲಾಗಿಲ್ಲ.',
+<<<<<<< HEAD
 delete_scheme_confirm:'ಈ ಯೋಜನೆಯನ್ನು ಅಳಿಸಬೇಕೇ?',
 make_admin:'ನಿರ್ವಾಹಕರಾಗಿ ಮಾಡಿ',
+=======
+delete_scheme_confirm:'ಈ ಯೋಜನೆಯನ್ನು ಅಳಿಸಬೇಕೆ?',
+make_admin:'ನಿರ್ವಾಹಕರನ್ನಾಗಿ ಮಾಡಿ',
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 revoke_admin:'ನಿರ್ವಾಹಕ ಹಕ್ಕು ತೆಗೆದುಹಾಕಿ',
 backup_restore:'ಬ್ಯಾಕಪ್ ಮತ್ತು ಮರುಸ್ಥಾಪನೆ',
 download_json_backup:'ಎಲ್ಲಾ ಡೇಟಾವನ್ನು JSON ಫೈಲ್ ಆಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ',
@@ -264,14 +308,18 @@ english:'English',
 default_language:'ಡೀಫಾಲ್ಟ್ ಭಾಷೆ',
 kannada:'ಕನ್ನಡ',
 kannada_desc:'Kannada - ಕನ್ನಡ ಭಾಷೆ',
+<<<<<<< HEAD
 hindi:'ಹಿಂದಿ',
 hindi_desc:'Hindi - हिन्दी भाषा',
+=======
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 enter_receipt_number:'ರಸೀದಿ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ',
 enter_particulars:'ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ',
 enter_beneficiary:'ಫಲಾನುಭವಿಯ ಹೆಸರನ್ನು ನಮೂದಿಸಿ',
 confirm:'ದೃಢೀಕರಿಸಿ',
 please_fill_all_fields:'ದಯವಿಟ್ಟು ಎಲ್ಲಾ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ',
 login_successful:'ಲಾಗಿನ್ ಯಶಸ್ವಿಯಾಗಿದೆ!',
+<<<<<<< HEAD
 invalid_email_password:'ಅಮಾನ್ಯ ಇಮೇಲ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್',
 google_signin_success:'Google ಮೂಲಕ ಯಶಸ್ವಿಯಾಗಿ ಲಾಗಿನ್ ಆಗಿದೆ!',
 passwords_do_not_match:'ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ',
@@ -281,20 +329,41 @@ user_not_found:'ಬಳಕೆದಾರ ಕಂಡುಬಂದಿಲ್ಲ',
 password_reset_successful:'ಪಾಸ್‌ವರ್ಡ್ ಯಶಸ್ವಿಯಾಗಿ ಮರುಹೊಂದಿಸಲಾಗಿದೆ!',
 current_password_wrong:'ಪ್ರಸ್ತುತ ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ',
 password_changed_successfully:'ಪಾಸ್‌ವರ್ಡ್ ಯಶಸ್ವಿಯಾಗಿ ಬದಲಾಯಿಸಲಾಗಿದೆ!',
+=======
+invalid_email_password:'ಅಮಾನ್ಯ ಈಮೇಲ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್',
+google_signin_success:'Google ಮೂಲಕ ಯಶಸ್ವಿಯಾಗಿ ಲಾಗಿನ್ ಆಗಿದೆ!',
+passwords_do_not_match:'ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ',
+account_created_successfully:'ಖಾತೆ ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ!',
+logout_successful:'ಯಶಸ್ವಿಯಾಗಿ ಲಾಗೌಟ್ ಆಗಿದೆ',
+user_not_found:'ಬಳಕೆದಾರ ಕಂಡುಬಂದಿಲ್ಲ',
+password_reset_successful:'ಪಾಸ್‌ವರ್ಡ್ ಯಶಸ್ವಿಯಾಗಿ ರೀಸೆಟ್ ಆಗಿದೆ!',
+current_password_wrong:'ಪ್ರಸ್ತುತ ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ',
+password_changed_successfully:'ಪಾಸ್‌ವರ್ಡ್ ಯಶಸ್ವಿಯಾಗಿ ಬದಲಾಗಿದೆ!',
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 welcome_back:'ಮತ್ತೆ ಸ್ವಾಗತ',
 dark_mode:'ಡಾರ್ಕ್ ಮೋಡ್',
 light_mode:'ಲೈಟ್ ಮೋಡ್',
 system_theme:'ಸಿಸ್ಟಮ್ ಥೀಮ್',
 toggle_theme:'ಥೀಮ್ ಬದಲಾಯಿಸಿ',
 jan:'ಜನ',
+<<<<<<< HEAD
 feb:'ಫೆಬ್',
 mar:'ಮಾರ್ಚ್',
 apr:'ಏಪ್ರಿಲ್',
+=======
+feb:'ಫೆಬ್ರ',
+mar:'ಮಾರ್ಚ್',
+apr:'ಏಪ್ರಿ',
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 may:'ಮೇ',
 jun:'ಜೂನ್',
 jul:'ಜುಲೈ',
 aug:'ಆಗಸ್ಟ್',
+<<<<<<< HEAD
 sep:'ಸೆಪ್',
+=======
+sep:'ಸೆಪ್ಟೆಂ',
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 oct:'ಅಕ್ಟೋ',
 nov:'ನವೆಂ',
 dec:'ಡಿಸೆಂ',
@@ -320,7 +389,11 @@ no_records_found:'ಯಾವುದೇ ದಾಖಲೆಗಳು ಕಂಡುಬಂ
 record_updated:'ದಾಖಲೆ ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ!',
 delete_record_confirm:'ಈ ದಾಖಲೆಯನ್ನು ಅಳಿಸಲು ಖಚಿತವಾಗಿದ್ದೀರಾ?',
 record_deleted:'ದಾಖಲೆ ಅಳಿಸಲಾಗಿದೆ!',
+<<<<<<< HEAD
 default_department:'ಸಹಾಯಕ ನಿರ್ದೇಶಕರು (ಗ್ರೇಡ್-1), ಸಮಾಜ ಕಲ್ಯಾಣ ಇಲಾಖೆ, ಬೀದರ್ ತಾಲ್ಲೂಕು',
+=======
+default_department:'ಸಹಾಯಕ ನಿರ್ದೇಶಕರು (ಗ್ರೇಡ್-1), ಸಮಾಜ ಕಲ್ಯಾಣ ಇಲಾಖೆ ಬೀದರ್ ತಾಲ್ಲೂಕು',
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 no_receipt_records:'ಈ ಅವಧಿಗೆ ಯಾವುದೇ ರಸೀದಿ ದಾಖಲೆಗಳಿಲ್ಲ',
 no_payment_records:'ಈ ಅವಧಿಗೆ ಯಾವುದೇ ಪಾವತಿ ದಾಖಲೆಗಳಿಲ್ಲ',
 no_report_to_export:'ರಫ್ತು ಮಾಡಲು ಯಾವುದೇ ವರದಿ ಇಲ್ಲ',
@@ -337,6 +410,7 @@ restored:'ಮರುಸ್ಥಾಪಿಸಲಾಗಿದೆ',
 invalid_backup_file:'ಅಮಾನ್ಯ ಬ್ಯಾಕಪ್ ಫೈಲ್!',
 delete_all_records_confirm:'ಎಲ್ಲಾ ದಾಖಲೆಗಳನ್ನು ಅಳಿಸಲು ಖಚಿತವಾಗಿದ್ದೀರಾ? ಇದನ್ನು ಹಿಂತಿರುಗಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ!',
 all_data_cleared:'ಎಲ್ಲಾ ಡೇಟಾವನ್ನು ಅಳಿಸಲಾಗಿದೆ!',
+<<<<<<< HEAD
 settings_saved:'ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಉಳಿಸಲಾಗಿದೆ!'
 },
 
@@ -540,6 +614,20 @@ invalid_backup_file:'अमान्य बैकअप फ़ाइल!',
 delete_all_records_confirm:'क्या आप वाकई सभी रिकॉर्ड हटाना चाहते हैं? इसे वापस नहीं किया जा सकता!',
 all_data_cleared:'सभी डेटा हटा दिया गया!',
 settings_saved:'सेटिंग्स सहेजी गईं!'
+=======
+settings_saved:'ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಉಳಿಸಲಾಗಿದೆ!',
+app_name:'ಹಣಕಾಸು ದಾಖಲೆ ನಿರ್ವಹಣಾ ವ್ಯವಸ್ಥೆ',
+dashboard_subtitle:'ADSWD BIDAR · ಹಣಕಾಸು ದಾಖಲೆಗಳು',
+cashbook_entry:'ನಗದು ಪುಸ್ತಕ ನಮೂದು',
+import_excel:'ಎಕ್ಸೆಲ್ ಆಮದು',
+clear_all:'ಎಲ್ಲವನ್ನೂ ಅಳಿಸಿ',
+add_scheme:'ಯೋಜನೆ ಸೇರಿಸಿ',
+all_days:'ಎಲ್ಲಾ ದಿನಗಳು',
+month_total:'ತಿಂಗಳ ಒಟ್ಟು',
+year_total:'ವರ್ಷದ ಒಟ್ಟು',
+sign_out:'ನಿರ್ಗಮನ',
+backup:'ಬ್ಯಾಕಪ್ ಮತ್ತು ಮರುಸ್ಥಾಪನೆ'
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 }
 };
 
@@ -575,7 +663,7 @@ export function setLanguage(lang) {
         const key = el.getAttribute('data-i18n-placeholder');
         if (dict[key]) el.placeholder = dict[key];
     });
-    document.documentElement.lang = lang === 'kn' ? 'kn' : lang === 'hi' ? 'hi' : 'en';
+    document.documentElement.lang = lang === 'kn' ? 'kn' : 'en';
     document.querySelectorAll('.lang-option').forEach(o => {
         o.style.borderColor = o.dataset.lang === lang ? 'var(--primary)' : 'var(--border)';
         o.style.background = o.dataset.lang === lang ? 'rgba(30,58,95,.05)' : '';

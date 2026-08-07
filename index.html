@@ -27,16 +27,15 @@
 <div class="shield-icon">
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
 </div>
-<h1>Social Welfare Department â€”<br><span>Financial Records</span></h1>
+<h1>Social Welfare Department —<br><span>Financial Records</span></h1>
 <p>Assistant Director of Social Welfare Department.<br>Government of Karnataka.</p>
 </div>
 <div class="login-left-footer">Authorized personnel only. All actions are logged.</div>
 </div>
 <div class="login-right">
 <select class="login-lang-select" data-action="setLanguage">
-    <option value="en" data-i18n="language.english">English</option>
-    <option value="kn" data-i18n="language.kannada">à²•à²¨à³à²¨à²¡</option>
-    <option value="hi" data-i18n="language.hindi">à¤¹à¤¿à¤¨à¥à¤¦à¥€</option>
+    <option value="en" data-i18n="english">English</option>
+    <option value="kn" data-i18n="kannada">ಕನ್ನಡ</option>
 </select>
 <div class="login-box">
 <h2
@@ -162,9 +161,8 @@ Create Account
 <span id="topbarWelcome" style="font-size:14px;color:var(--text-light)" data-i18n="welcome_back">Welcome back</span></div>
 <div class="topbar-right">
 <select id="topbarLang" data-action="setLanguage" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--card);color:var(--text);cursor:pointer">
-    <option value="en" data-i18n="language.english">English</option>
-    <option value="kn" data-i18n="language.kannada">à²•à²¨à³à²¨à²¡</option>
-    <option value="hi" data-i18n="language.hindi">à¤¹à¤¿à¤‚à¤¦à¥€</option>
+    <option value="en" data-i18n="english">English</option>
+    <option value="kn" data-i18n="kannada">ಕನ್ನಡ</option>
 </select>
 <button class="topbar-btn" data-action="cycleTheme" id="themeToggle" title="Toggle theme">
 <span id="themeIcon"></span>
@@ -182,7 +180,7 @@ Create Account
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
 <div>
 <h2 style="font-size:28px;font-weight:700" data-i18n="nav_dashboard">Dashboard</h2>
-<p style="font-size:14px;color:var(--text-light);margin-top:4px"data-i18n="dashboard_subtitle">ADSWD BIDAR Â· Financial Records</p>
+<p style="font-size:14px;color:var(--text-light);margin-top:4px"data-i18n="dashboard_subtitle">ADSWD BIDAR · Financial Records</p>
 </div>
 <button class="btn btn-primary" data-action="navigateTo" data-arg="cashbook" style="background:#0d9488;padding:12px 20px;font-size:14px">+ <span data-i18n="nav_cashbook">Cash Book Entry</span></button>
 </div>
@@ -326,7 +324,7 @@ Create Account
 <div class="page" id="page-records">
 <div style="margin-bottom:8px">
 <h2 style="font-size:24px;font-weight:700" data-i18n="nav_records">Records</h2>
-<p style="font-size:13px;color:var(--text-light)" id="recordsSubtitle">ADSWD Â· Financial Records</p>
+<p style="font-size:13px;color:var(--text-light)" id="recordsSubtitle">ADSWD · Financial Records</p>
 </div>
 <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
 <button class="btn btn-outline btn-sm" data-action="navigateTo" data-arg="import">  <span data-i18n="nav_import">Import</span></button>
@@ -413,7 +411,11 @@ Create Account
 <div class="total-row grand"><span data-i18n="grand_total">GRAND TOTAL</span><span id="rptReceiptGrand">₹0</span></div>
 </div>
 <div class="total-section payments-tot">
+<<<<<<< HEAD
 <div style="font-weight:700;margin-bottom:8px">PAYMENTS / <span class="kannada-text">ಪಾವತಿಗಳು</span></div>
+=======
+<div style="font-weight:700;margin-bottom:8px">PAYMENTS / <span class="kannada-text">ಸಂದಾಯಗಳು</span></div>
+>>>>>>> 309b756 (Deleted the hindi language completely. And cleared all the encoding issues.)
 <div class="total-row"><span>NET AMOUNT</span><span id="rptPaymentNet">₹0</span></div>
 <div class="total-row"><span>DEDUCTION</span><span id="rptPaymentDed">₹0</span></div>
 <div class="total-row grand"><span data-i18n="grand_total">GRAND TOTAL</span><span id="rptPaymentGrand">₹0</span></div>
@@ -510,7 +512,7 @@ Create Account
 <h3 data-i18n="backup">Backup & Restore</h3>
 <div class="backup-options">
 <div class="backup-card" data-action="createBackup">
-<div style="font-size:32px;margin-bottom:8px"> Ã¯Â¸Â</div>
+<div style="font-size:32px;margin-bottom:8px">📦</div>
 <h4 data-i18n="create_backup">Create Backup</h4>
 <p style="font-size:12px;color:var(--text-light);margin-top:4px" data-i18n="backup_desc">Download all data as JSON file</p>
 </div>
@@ -586,7 +588,7 @@ Create Account
 <h3 style="font-size:18px;font-weight:700;margin-bottom:20px" data-i18n="backup_restore">Backup & Restore</h3>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 <div data-action="createBackup" class="card-hover" style="padding:24px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:.2s">
-<div style="font-size:32px;margin-bottom:12px"> Ã¯Â¸Â</div>
+<div style="font-size:32px;margin-bottom:12px">📦</div>
 <h4 style="font-size:16px;font-weight:600;margin-bottom:4px" data-i18n="create_backup">Create Backup</h4>
 <p style="font-size:13px;color:var(--text-light)" data-i18n="download_json_backup">Download all data as JSON file</p>
 </div>
@@ -635,11 +637,7 @@ Create Account
 </label>
 <label style="display:flex;align-items:center;gap:12px;padding:16px;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:.2s" class="lang-option" data-lang="kn">
 <input type="radio" name="lang" value="kn" data-action="setLanguage">
-<div><strong class="kannada-text" data-i18n="kannada">à²•à²¨à³à²¨à²¡</strong><br><span style="font-size:12px;color:var(--text-light)" data-i18n="kannada_desc">Kannada - à²•à²¨à³à²¨à²¡ à²­à²¾à²·à³†</span></div>
-</label>
-<label style="display:flex;align-items:center;gap:12px;padding:16px;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:.2s" class="lang-option" data-lang="hi">
-<input type="radio" name="lang" value="hi" data-action="setLanguage">
-<div><strong data-i18n="hindi">à¤¹à¤¿à¤¨à¥à¤¦à¥€</strong><br><span style="font-size:12px;color:var(--text-light)" data-i18n="hindi_desc">Hindi - à¤¹à¤¿à¤¨à¥à¤¦à¥€ à¤­à¤¾à¤·à¤¾</span></div>
+<div><strong class="kannada-text" data-i18n="kannada">ಕನ್ನಡ</strong><br><span style="font-size:12px;color:var(--text-light)" data-i18n="kannada_desc">Kannada - ಕನ್ನಡ ಭಾಷೆ</span></div>
 </label>
 </div>
 </div>
@@ -654,7 +652,7 @@ Create Account
 <div class="modal">
 <div class="modal-header">
 <h3 data-i18n="edit_record">Edit Record</h3>
-<button class="modal-close" data-action="closeEditModal">Ãƒâ€”</button>
+<button class="modal-close" data-action="closeEditModal">×</button>
 </div>
 <div class="modal-body">
 <input type="hidden" id="editId">
@@ -706,7 +704,7 @@ Create Account
 <div class="modal" style="max-width:400px">
 <div class="modal-header">
 <h3 data-i18n="confirm">Confirm</h3>
-<button class="modal-close" data-action="closeConfirmModal">Ãƒâ€”</button>
+<button class="modal-close" data-action="closeConfirmModal">×</button>
 </div>
 <div class="modal-body">
 <p id="confirmMessage"></p>

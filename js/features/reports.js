@@ -278,12 +278,12 @@ export function exportReportExcel() {
     const payments = filtered.filter(r => r.type === "payment");
     const rows = [];
     rows.push([
-        "RECEIPTS", "", "", "", "", "", "",
-        "PAYMENTS", "", "", "", "", "", ""
+        t('receipts').toUpperCase(), "", "", "", "", "", "",
+        t('payments').toUpperCase(), "", "", "", "", "", ""
     ]);
     rows.push([
-        "Date", "Receipt No", "Particulars", "Net Pay", "Deduction", "Gross", "Total",
-        "Date", "Receipt No", "Particulars", "Token", "UTR", "Net Pay", "Gross"
+        t('date'), t('receipt_no'), t('particulars'), t('net_pay'), t('deduction'), t('gross_amount'), t('total'),
+        t('date'), t('receipt_no'), t('particulars'), t('token_no'), t('utr_no'), t('net_pay'), t('gross_amount')
     ]);
     const maxRows = Math.max(receipts.length, payments.length);
     for (let i = 0; i < maxRows; i++) {
