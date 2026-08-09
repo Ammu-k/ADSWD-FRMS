@@ -199,7 +199,7 @@ export async function exportReportPDF() {
         host.style.position = 'fixed';
         host.style.left = '-10000px';
         host.style.top = '0';
-        host.style.width = '210mm';
+        host.style.width = '297mm';
         host.style.background = '#fff';
         host.style.zIndex = '-1';
         const styleEl = document.createElement('style');
@@ -223,7 +223,7 @@ export async function exportReportPDF() {
         host.remove();
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         const pageW = pdf.internal.pageSize.getWidth();
         const pageH = pdf.internal.pageSize.getHeight();
         const margin = 8;

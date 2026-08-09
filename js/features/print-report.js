@@ -1,7 +1,8 @@
-// print-report.js - Standalone A4 print report template.
-// Opens a new self-contained window (no app CSS), renders the records into a
-// government letterhead report (Karnataka emblem + watermark), prints A4
-// portrait via the browser's built-in dialog, then closes.
+// print-report.js - Standalone A4 landscape print report template.
+// Renders the records into a government letterhead report (Karnataka emblem +
+// watermark) with a merged bilingual heading, bilingual summary band and
+// side-by-side detail tables. Shared by both the browser Print dialog and the
+// PDF export.
 
 import { esc, formatDate } from "../utils/format.js";
 
@@ -25,6 +26,24 @@ export async function loadLogoBase64() {
     }
 }
 
+const RECEIPTS_TITLE = 'RECEIPTS / ರಸೀತಿಗಳು';
+const PAYMENTS_TITLE = 'PAYMENTS / ಸಂದಾಯಗಳು';
+
+function buildSummaryBlock(records, type, title) {
+    const rows = records.filter(r => r.type === type);
+    const net = rows.reduce((s, r) => s + (parseFloat(r.netPay) || 0), 0);
+    const ded = rows.reduce((s, r) => s + (parseFloat(r.deduction) || 0), 0);
+    const gross = rows.reduce((s, r) => s + (parseFloat(r.grossAmount) || 0), 0);
+    return `<div>
+        <div class="sm-title">${esc(title)}</div>
+        <table class="sm">
+            <tr><td>NET AMOUNT</td><td class="num">${money(net)}</td></tr>
+            <tr><td>DEDUCTION</td><td class="num">${money(ded)}</td></tr>
+            <tr class="grand"><td>GRAND TOTAL</td><td class="num">${money(gross)}</td></tr>
+        </table>
+    </div>`;
+}
+
 function buildReceiptsTable(records) {
     const rs = records.filter(r => r.type === 'receipt');
     const net = rs.reduce((s, r) => s + (parseFloat(r.netPay) || 0), 0);
@@ -37,19 +56,20 @@ function buildReceiptsTable(records) {
         <td class="num">${money(r.netPay)}</td>
         <td class="num">${money(r.deduction)}</td>
         <td class="num">${money(r.grossAmount)}</td>
-        <td class="num">${money(r.grossAmount)}</td>
-    </tr>`).join('') : `<tr><td colspan="7" class="empty">No receipt records</td></tr>`;
-    return {
-        html: `<table>
+    </tr>`).join('') : `<tr><td colspan="6" class="empty">No receipt records</td></tr>`;
+    return `<div>
+        <div class="sec-title">${RECEIPTS_TITLE}</div>
+        <table>
+            <colgroup><col style="width:11%"><col style="width:12%"><col style="width:42%"><col style="width:12%"><col style="width:11%"><col style="width:12%"></colgroup>
             <thead><tr>
                 <th>Date</th><th>Receipt No.</th><th>Particulars</th>
-                <th>Net Pay</th><th>Deduction</th><th>Gross Amount</th><th>Total</th>
+                <th>Net Pay</th><th>Deduction</th><th>Gross Amount</th>
             </tr></thead>
             <tbody>${body}
-            <tr class="total"><td colspan="3">TOTAL</td><td class="num">${money(net)}</td><td class="num">${money(ded)}</td><td class="num">${money(gross)}</td><td class="num">${money(gross)}</td></tr>
+            <tr class="total"><td colspan="3">TOTAL</td><td class="num">${money(net)}</td><td class="num">${money(ded)}</td><td class="num">${money(gross)}</td></tr>
             </tbody>
-        </table>`
-    };
+        </table>
+    </div>`;
 }
 
 function buildPaymentsTable(records) {
@@ -61,30 +81,28 @@ function buildPaymentsTable(records) {
         <td>${esc(formatDate(r.date))}</td>
         <td>${esc(r.receiptNo || '-')}</td>
         <td>${esc(r.beneficiary || r.particulars || '-')}</td>
-        <td>${esc(r.tokenNo || '-')}</td>
-        <td>${esc(r.utrNo || '-')}</td>
-        <td>${esc(formatDate(r.paymentDate || r.date))}</td>
         <td class="num">${money(r.netPay)}</td>
         <td class="num">${money(r.deduction)}</td>
         <td class="num">${money(r.grossAmount)}</td>
-    </tr>`).join('') : `<tr><td colspan="9" class="empty">No payment records</td></tr>`;
-    return {
-        html: `<table>
+    </tr>`).join('') : `<tr><td colspan="6" class="empty">No payment records</td></tr>`;
+    return `<div>
+        <div class="sec-title">${PAYMENTS_TITLE}</div>
+        <table>
+            <colgroup><col style="width:11%"><col style="width:12%"><col style="width:42%"><col style="width:12%"><col style="width:11%"><col style="width:12%"></colgroup>
             <thead><tr>
-                <th>Date</th><th>Rcpt No.</th><th>Particulars</th>
-                <th>Token No.</th><th>UTR No.</th><th>Pay Date</th>
-                <th>Net Pay</th><th>Ded.</th><th>Gross</th>
+                <th>Date</th><th>Receipt No.</th><th>Particulars</th>
+                <th>Net Pay</th><th>Deduction</th><th>Gross Amount</th>
             </tr></thead>
             <tbody>${body}
-            <tr class="total"><td colspan="6">TOTAL</td><td class="num">${money(net)}</td><td class="num">${money(ded)}</td><td class="num">${money(gross)}</td></tr>
+            <tr class="total"><td colspan="3">TOTAL</td><td class="num">${money(net)}</td><td class="num">${money(ded)}</td><td class="num">${money(gross)}</td></tr>
             </tbody>
-        </table>`
-    };
+        </table>
+    </div>`;
 }
 
 function buildReportCSS(logo) {
     return `
-@page { size: A4 portrait; margin: 10mm; }
+@page { size: A4 landscape; margin: 10mm; }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
@@ -107,7 +125,7 @@ body {
 .sheet {
     border: 1.5px solid #1c2e4a;
     padding: 6mm;
-    min-height: 277mm;
+    min-height: 190mm;
 }
 .letterhead {
     display: flex;
@@ -115,72 +133,73 @@ body {
     gap: 10px;
     border-bottom: 2.5px solid #1c2e4a;
     padding-bottom: 4mm;
-    margin-bottom: 4mm;
+    margin-bottom: 3mm;
 }
 .emblem { width: 20mm; height: 20mm; object-fit: contain; flex-shrink: 0; }
 .dh { flex: 1; text-align: center; }
-.dh .gov { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #1c2e4a; }
-.dh .gov2 { font-size: 11px; font-weight: 600; margin-top: 1px; }
-.dh .dept { font-size: 13px; font-weight: 700; margin-top: 3px; text-transform: uppercase; }
-.dh .dept2 { font-size: 11px; margin-top: 1px; }
-.dh .title { font-size: 16px; font-weight: 800; letter-spacing: 2px; margin-top: 4px; color: #1c2e4a; }
-.dh .title.kn { letter-spacing: normal; }
-.dh .title-kn { font-size: 12px; font-weight: 600; margin-top: 1px; color: #1c2e4a; }
+.dh .gov1 { font-size: 14px; font-weight: 800; letter-spacing: 1px; color: #1c2e4a; }
+.dh .gov2 { font-size: 12px; font-weight: 600; margin-top: 1px; }
+.dh .dept { font-size: 12px; font-weight: 700; margin-top: 2px; }
+.dh .title { font-size: 15px; font-weight: 800; letter-spacing: 1px; margin-top: 4px; color: #1c2e4a; }
 .dh .period { font-size: 11px; margin-top: 2px; font-weight: 600; }
 .meta { font-size: 10px; color: #374151; }
 .side { flex-shrink: 0; text-align: right; font-size: 10px; color: #374151; align-self: flex-end; }
-.tables { display: flex; width: 100%; margin-top: 3mm; }
-.tables > div { flex: 1 1 50%; width: 50%; min-width: 0; }
+.summary { display: flex; gap: 4mm; width: 100%; margin-top: 3mm; }
+.summary > div { flex: 1 1 calc(50% - 2mm); width: calc(50% - 2mm); min-width: 0; }
+.sm-title { font-size: 9.5px; font-weight: 800; text-align: center; background: #eef2f7; border: 0.5px solid #1c2e4a; border-bottom: none; padding: 2px 3px; }
+.tables { display: flex; gap: 4mm; width: 100%; margin-top: 3mm; }
+.tables > div { flex: 1 1 calc(50% - 2mm); width: calc(50% - 2mm); min-width: 0; }
+.sec-title { font-size: 9.5px; font-weight: 800; text-align: center; background: #eef2f7; border: 0.5px solid #1c2e4a; border-bottom: none; padding: 2px 3px; }
 .sheet table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .sheet th, .sheet td { border: 0.5px solid #1c2e4a; padding: 2.5px 3px; font-size: 8.5px; vertical-align: top; text-align: left; white-space: normal; word-break: break-word; letter-spacing: normal; overflow-wrap: anywhere; color: #111827; }
 .sheet th { background: #eef2f7; font-weight: 700; text-align: center; color: #111827; }
 .sheet td.num { text-align: right; white-space: nowrap; }
 tr.total td { font-weight: 800; background: #f6f8fb; border-top: 1.5px solid #1c2e4a; }
 td.empty { text-align: center; color: #6b7280; padding: 8px 4px; }
+.sm td { font-weight: 600; }
+.sm tr.grand td { font-weight: 800; background: #f6f8fb; border-top: 1.5px solid #1c2e4a; }
 .totals { display: flex; gap: 10px; margin-top: 3mm; }
 .totals > div { flex: 1; border: 1px solid #1c2e4a; padding: 3px 6px; font-size: 9px; }
 .totals b { float: right; font-weight: 800; }
-.sign { display: flex; justify-content: space-between; margin-top: 18mm; }
-.sign > div { width: 42%; font-size: 11px; font-weight: 700; text-align: center; }
-.sign .line { border-top: 1.5px solid #111827; margin-top: 26mm; padding-top: 3px; }
+.sign { display: flex; justify-content: space-between; margin-top: 10mm; }
+.sign > div { width: 42%; font-size: 11px; font-weight: 700; text-align: center; padding-top: 12mm; }
 .foot { margin-top: 4mm; font-size: 8.5px; text-align: center; color: #6b7280; }
 `;
 }
 
 function buildSheetHTML(data, logo) {
-    const title = data.title || 'CASH BOOK';
-    const dept = data.dept || '';
     const period = data.period || '';
     const metaLine = data.finYear ? `${period} &nbsp;·&nbsp; FY ${esc(data.finYear)}` : period;
     const logoImg = logo ? `<img class="emblem" src="${logo}" alt="Karnataka Emblem">` : '';
     const head = buildReceiptsTable(data.records);
     const pay = buildPaymentsTable(data.records);
-
-    const isLatin = /^[\x00-\x7F\s]*$/.test(title);
-    const titleClass = isLatin ? 'title' : 'title kn';
+    const sumR = buildSummaryBlock(data.records, 'receipt', RECEIPTS_TITLE);
+    const sumP = buildSummaryBlock(data.records, 'payment', PAYMENTS_TITLE);
 
     return `<div class="sheet">
     ${logo ? '<div class="watermark"></div>' : ''}
     <div class="letterhead">
         ${logoImg}
         <div class="dh">
-            <div class="gov">GOVERNMENT OF KARNATAKA</div>
-            <div class="gov2">ಸರ್ಕಾರ ಆಫ್ ಕರ್ನಾಟಕ</div>
-            <div class="dept">${esc(dept)}</div>
-            <div class="${titleClass}">${esc(title)}</div>
-            ${data.titleKn ? `<div class="title-kn">${esc(data.titleKn)}</div>` : ''}
+            <div class="gov1">ಕರ್ನಾಟಕ ಸರ್ಕಾರ</div>
+            <div class="gov2">ಸಹಾಯಕ ನಿರ್ದೇಶಕರು (ಗ್ರೇಡ್-1)</div>
+            <div class="dept">ಸಮಾಜ ಕಲ್ಯಾಣ ಇಲಾಖೆ ಬೀದರ</div>
+            <div class="title">CASH BOOK (ನಗದು ಪುಸ್ತಕ)</div>
             <div class="period">${metaLine}</div>
-            ${data.finYear ? `<div class="meta">${esc(data.finYear)}</div>` : ''}
         </div>
         <div class="side">${period}</div>
     </div>
+    <div class="summary">
+        ${sumR}
+        ${sumP}
+    </div>
     <div class="tables">
-        <div>${head.html}</div>
-        <div>${pay.html}</div>
+        ${head}
+        ${pay}
     </div>
     <div class="sign">
-        <div><div class="line">${esc(data.preparedBy || '________')}<br>Prepared By</div></div>
-        <div><div class="line">${esc(data.verifiedBy || '________')}<br>Verified By</div></div>
+        <div>Prepared By</div>
+        <div>Verified By</div>
     </div>
     <div class="foot">&copy; ${(new Date()).getFullYear()} ADSWD Bidar · Financial Records Management System</div>
 </div>`;
@@ -213,7 +232,7 @@ export async function generateSheetParts(data) {
 export async function openPrintWindow(data) {
     const logo = await loadLogoBase64();
     const html = buildTemplate(data, logo);
-    const w = window.open('', '_blank', 'width=900,height=1200');
+    const w = window.open('', '_blank', 'width=1280,height=800');
     if (!w) {
         alert('Please allow pop-ups to print the report.');
         return;

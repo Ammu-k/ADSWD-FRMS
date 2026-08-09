@@ -248,7 +248,7 @@ tr:hover{background:rgba(13,148,136,.03)}
 /* PRINT */
 @media print{
     @page{
-        size: A4 portrait;
+        size: A4 landscape;
         margin: 12.7mm;
     }
     body{
