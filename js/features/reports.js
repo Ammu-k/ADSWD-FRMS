@@ -226,7 +226,7 @@ export async function exportReportPDF() {
         const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         const pageW = pdf.internal.pageSize.getWidth();
         const pageH = pdf.internal.pageSize.getHeight();
-        const margin = 8;
+        const margin = 0;
 
         const scale = (pageW - 2 * margin) / canvas.width;
         const sliceHmm = pageH - 2 * margin;

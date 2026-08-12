@@ -27,7 +27,7 @@ export async function loadLogoBase64() {
 }
 
 const RECEIPTS_TITLE = 'RECEIPTS / ರಸೀತಿಗಳು';
-const PAYMENTS_TITLE = 'PAYMENTS / ಸಂದಾಯಗಳು';
+const PAYMENTS_TITLE = 'PAYMENTS / ಪಾವತಿಗಳು';
 
 function buildSummaryBlock(records, type, title) {
     const rows = records.filter(r => r.type === type);
@@ -137,10 +137,10 @@ body {
 }
 .emblem { width: 20mm; height: 20mm; object-fit: contain; flex-shrink: 0; }
 .dh { flex: 1; text-align: center; }
-.dh .gov1 { font-size: 14px; font-weight: 800; letter-spacing: 1px; color: #1c2e4a; }
+.dh .gov1 { font-size: 14px; font-weight: 800; color: #1c2e4a; }
 .dh .gov2 { font-size: 12px; font-weight: 600; margin-top: 1px; }
 .dh .dept { font-size: 12px; font-weight: 700; margin-top: 2px; }
-.dh .title { font-size: 15px; font-weight: 800; letter-spacing: 1px; margin-top: 4px; color: #1c2e4a; }
+.dh .title { font-size: 15px; font-weight: 800; margin-top: 4px; color: #1c2e4a; }
 .dh .period { font-size: 11px; margin-top: 2px; font-weight: 600; }
 .meta { font-size: 10px; color: #374151; }
 .side { flex-shrink: 0; text-align: right; font-size: 10px; color: #374151; align-self: flex-end; }
@@ -183,7 +183,7 @@ function buildSheetHTML(data, logo) {
         <div class="dh">
             <div class="gov1">ಕರ್ನಾಟಕ ಸರ್ಕಾರ</div>
             <div class="gov2">ಸಹಾಯಕ ನಿರ್ದೇಶಕರು (ಗ್ರೇಡ್-1)</div>
-            <div class="dept">ಸಮಾಜ ಕಲ್ಯಾಣ ಇಲಾಖೆ ಬೀದರ</div>
+            <div class="dept">ಸಮಾಜ ಕಲ್ಯಾಣ ಇಲಾಖೆ ಬೀದರ್</div>
             <div class="title">CASH BOOK (ನಗದು ಪುಸ್ತಕ)</div>
             <div class="period">${metaLine}</div>
         </div>
