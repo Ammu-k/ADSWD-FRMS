@@ -45,7 +45,7 @@ function buildSummaryBlock(records, type, title) {
 }
 
 const RECEIPT_COLS = 6;
-const PAYMENT_COLS = 9;
+const PAYMENT_COLS = 8;
 const TOTAL_COLS = RECEIPT_COLS + PAYMENT_COLS;
 
 function receiptCells(r) {
@@ -63,7 +63,6 @@ function paymentCells(r) {
         <td>${esc(r.beneficiary || r.particulars || '-')}</td>
         <td>${esc(r.tokenNo || '-')}</td>
         <td>${esc(r.utrNo || '-')}</td>
-        <td>${esc(formatDate(r.paymentDate || r.date))}</td>
         <td class="num">${money(r.netPay)}</td>
         <td class="num">${money(r.deduction)}</td>
         <td class="num">${money(r.grossAmount)}</td>`;
@@ -99,7 +98,7 @@ function buildMergedTable(records) {
 
     return `<div>
         <table>
-            <colgroup><col style="width:6%"><col style="width:7%"><col style="width:16%"><col style="width:8%"><col style="width:7%"><col style="width:6%"><col style="width:5%"><col style="width:5%"><col style="width:10%"><col style="width:4%"><col style="width:4%"><col style="width:5%"><col style="width:5%"><col style="width:6%"><col style="width:6%"></colgroup>
+            <colgroup><col style="width:6%"><col style="width:7%"><col style="width:16%"><col style="width:8%"><col style="width:7%"><col style="width:6%"><col style="width:6%"><col style="width:6%"><col style="width:12%"><col style="width:5%"><col style="width:5%"><col style="width:6%"><col style="width:5%"><col style="width:5%"></colgroup>
             <thead>
             <tr>
                 <th colspan="${RECEIPT_COLS}" class="sec-title col-last-r">${RECEIPTS_TITLE}</th>
@@ -107,12 +106,12 @@ function buildMergedTable(records) {
             </tr>
             <tr>
                 <th>Date</th><th>Receipt No.</th><th>Particulars</th><th>Net Pay</th><th>Deduction</th><th class="col-last-r">Gross Amount</th>
-                <th class="col-first-p">Date</th><th>Receipt No.</th><th>Particulars</th><th>Token No.</th><th>UTR No.</th><th>Payment Date</th><th>Net Pay</th><th>Deduction</th><th>Gross Amount</th>
+                <th class="col-first-p">Date</th><th>Receipt No.</th><th>Particulars</th><th>Token No.</th><th>UTR No.</th><th>Net Pay</th><th>Deduction</th><th>Gross Amount</th>
             </tr></thead>
             <tbody>${body}
             <tr class="total">
                 <td colspan="3">RECEIPTS TOTAL</td><td class="num">${money(rNet)}</td><td class="num">${money(rDed)}</td><td class="num col-last-r">${money(rGross)}</td>
-                <td colspan="6" class="col-first-p">PAYMENTS TOTAL</td><td class="num">${money(pNet)}</td><td class="num">${money(pDed)}</td><td class="num">${money(pGross)}</td>
+                <td colspan="5" class="col-first-p">PAYMENTS TOTAL</td><td class="num">${money(pNet)}</td><td class="num">${money(pDed)}</td><td class="num">${money(pGross)}</td>
             </tr>
             <tr class="total">
                 <td colspan="${TOTAL_COLS}">GRAND TOTAL &nbsp;·&nbsp; Net ${money(rNet + pNet)} &nbsp;·&nbsp; Deduction ${money(rDed + pDed)} &nbsp;·&nbsp; Gross ${money(rGross + pGross)}</td>
@@ -124,7 +123,12 @@ function buildMergedTable(records) {
 
 function buildReportCSS(logo) {
     return `
-@page { size: A4 landscape; margin: 10mm; }
+@page { size: A4 landscape; margin: 15mm;
+    @top-center    { content: ""; border-bottom: 1.5px solid #1c2e4a; }
+    @bottom-center { content: ""; border-top: 1.5px solid #1c2e4a; }
+    @left-center   { content: ""; border-right: 1.5px solid #1c2e4a; }
+    @right-center  { content: ""; border-left: 1.5px solid #1c2e4a; }
+}
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
@@ -145,9 +149,7 @@ body {
 }
 .sheet > * { position: relative; z-index: 1; }
 .sheet {
-    border: 1.5px solid #1c2e4a;
-    padding: 6mm;
-    min-height: 190mm;
+    min-height: 180mm;
 }
 .letterhead {
     display: flex;
@@ -191,6 +193,7 @@ td.empty { text-align: center; color: #6b7280; padding: 8px 4px; }
 .sign { display: flex; justify-content: space-between; margin-top: 10mm; }
 .sign > div { width: 42%; font-size: 11px; font-weight: 700; text-align: center; padding-top: 12mm; }
 .foot { margin-top: 4mm; font-size: 8.5px; text-align: center; color: #6b7280; }
+#pageFiller { width: 100%; }
 `;
 }
 
@@ -226,6 +229,7 @@ function buildSheetHTML(data, logo) {
         <div>Verified By</div>
     </div>
     <div class="foot">&copy; ${(new Date()).getFullYear()} ADSWD Bidar · Financial Records Management System</div>
+    <div id="pageFiller"></div>
 </div>`;
 }
 
@@ -248,6 +252,17 @@ ${buildSheetHTML(data, logo)}
 (function(){
   function printNow(){window.print();}
   function run(){
+    var filler = document.getElementById('pageFiller');
+    if(filler){
+      var pageH = 180;
+      var pageHpx = pageH * (96/25.4);
+      var body = document.body;
+      var totalH = body.scrollHeight;
+      var remainder = totalH % pageHpx;
+      if(remainder > 1 && remainder < pageHpx - 1){
+        filler.style.height = (pageHpx - remainder) + 'px';
+      }
+    }
     if(document.fonts&&document.fonts.ready){
       document.fonts.ready.then(printNow)['catch'](printNow);
       setTimeout(printNow,600);

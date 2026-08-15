@@ -38,8 +38,6 @@ export function filterRecords() {
     });
 
     document.getElementById('recordCount').textContent = `${filtered.length} ${t('records')}`;
-    const totalAmt = filtered.reduce((s, r) => s + (parseFloat(r.grossAmount) || 0), 0);
-    document.getElementById('recordsSubtitle').textContent = `${filtered.length} ${t('shown')} · ₹${totalAmt.toLocaleString('en-IN')}`;
     document.getElementById('recordsBody').innerHTML = filtered.length ? filtered.map(r => `<tr>
 <td>${formatDate(r.date)}</td>
 <td><span class="badge ${r.type === 'receipt' ? 'badge-success' : 'badge-danger'}">${t(r.type)}</span></td>

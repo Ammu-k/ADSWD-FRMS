@@ -98,11 +98,11 @@ export function generateReport() {
     if (pairs.length) {
         document.getElementById('reportBody').innerHTML = pairs.map(({ receipt, payment }) => `<tr>
             ${receipt ? `<td>${formatDate(receipt.date)}</td><td>${esc(receipt.receiptNo || '-')}</td><td>${esc(receipt.particulars || '-')}</td><td class="amount">${money(receipt.netPay)}</td><td class="amount">${money(receipt.deduction)}</td><td class="amount col-last-r">${money(receipt.grossAmount)}</td>` : '<td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="col-last-r">-</td>'}
-            ${payment ? `<td class="col-first-p">${formatDate(payment.date)}</td><td>${esc(payment.receiptNo || '-')}</td><td>${esc(payment.beneficiary || payment.particulars || '-')}</td><td>${esc(payment.tokenNo || '-')}</td><td>${esc(payment.utrNo || '-')}</td><td>${formatDate(payment.paymentDate || payment.date)}</td><td class="amount">${money(payment.netPay)}</td><td class="amount">${money(payment.deduction)}</td><td class="amount">${money(payment.grossAmount)}</td>` : '<td class="col-first-p">-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>'}
+            ${payment ? `<td class="col-first-p">${formatDate(payment.date)}</td><td>${esc(payment.receiptNo || '-')}</td><td>${esc(payment.beneficiary || payment.particulars || '-')}</td><td>${esc(payment.tokenNo || '-')}</td><td>${esc(payment.utrNo || '-')}</td><td class="amount">${money(payment.netPay)}</td><td class="amount">${money(payment.deduction)}</td><td class="amount">${money(payment.grossAmount)}</td>` : '<td class="col-first-p">-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>'}
         </tr>`).join('') + `
-<tr style="${rcStyle}"><td colspan="3">RECEIPTS TOTAL</td><td class="amount">${money(rNet)}</td><td class="amount">${money(rDed)}</td><td class="amount col-last-r">${money(rGross)}</td><td colspan="6" class="col-first-p">PAYMENTS TOTAL</td><td class="amount">${money(pNet)}</td><td class="amount">${money(pDed)}</td><td class="amount">${money(pGross)}</td></tr>`;
+<tr style="${rcStyle}"><td colspan="3">RECEIPTS TOTAL</td><td class="amount">${money(rNet)}</td><td class="amount">${money(rDed)}</td><td class="amount col-last-r">${money(rGross)}</td><td colspan="5" class="col-first-p">PAYMENTS TOTAL</td><td class="amount">${money(pNet)}</td><td class="amount">${money(pDed)}</td><td class="amount">${money(pGross)}</td></tr>`;
     } else {
-        document.getElementById('reportBody').innerHTML = `<tr><td colspan="15" style="text-align:center;padding:20px;color:var(--text-light)">${t('no_records_found')}</td></tr>`;
+        document.getElementById('reportBody').innerHTML = `<tr><td colspan="14" style="text-align:center;padding:20px;color:var(--text-light)">${t('no_records_found')}</td></tr>`;
     }
 }
 
@@ -186,13 +186,15 @@ export async function exportReportPDF() {
         host.style.position = 'fixed';
         host.style.left = '-10000px';
         host.style.top = '0';
-        host.style.width = '297mm';
+        host.style.width = '267mm';
         host.style.background = '#fff';
         host.style.zIndex = '-1';
         const styleEl = document.createElement('style');
         styleEl.textContent = css;
         host.appendChild(styleEl);
         host.insertAdjacentHTML('beforeend', sheet);
+        const pdfGrandTotalRow = host.querySelector('.merged-table tbody tr.total:last-child');
+        if (pdfGrandTotalRow) pdfGrandTotalRow.remove();
         document.body.appendChild(host);
 
         if (document.fonts && document.fonts.ready) {
@@ -211,34 +213,100 @@ export async function exportReportPDF() {
             height: el.scrollHeight,
             logging: false
         });
+        const sheetRect = el.getBoundingClientRect();
+        const cscale = canvas.width / sheetRect.width;
+
+        const thead = el.querySelector('.merged-table thead');
+        let headerTopPx = 0;
+        let headerHpx = 0;
+        if (thead) {
+            const hr = thead.getBoundingClientRect();
+            headerTopPx = Math.round((hr.top - sheetRect.top) * cscale);
+            headerHpx = Math.round(hr.height * cscale);
+        }
+
+        const rowTops = [];
+        const rowBottoms = [];
+        const tbody = el.querySelector('.merged-table tbody');
+        if (tbody) {
+            tbody.querySelectorAll('tr').forEach(tr => {
+                const r = tr.getBoundingClientRect();
+                const top = Math.round((r.top - sheetRect.top) * cscale);
+                rowTops.push(top);
+                rowBottoms.push(top + Math.round(r.height * cscale));
+            });
+        }
+        const signEl = el.querySelector('.sign');
+        const footEl = el.querySelector('.foot');
+        if (signEl) rowBottoms.push(Math.round((signEl.getBoundingClientRect().bottom - sheetRect.top) * cscale));
+        if (footEl) rowBottoms.push(Math.round((footEl.getBoundingClientRect().bottom - sheetRect.top) * cscale));
+        rowBottoms.sort((a, b) => a - b);
         host.remove();
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         const pageW = pdf.internal.pageSize.getWidth();
         const pageH = pdf.internal.pageSize.getHeight();
-        const margin = 0;
+        const margin = 15;
+        const contentW = pageW - 2 * margin;
+        const contentH = pageH - 2 * margin;
+        const mmPerPx = contentW / canvas.width;
+        const pageHpx = Math.round(contentH / mmPerPx);
 
-        const scale = (pageW - 2 * margin) / canvas.width;
-        const sliceHmm = pageH - 2 * margin;
-        const sliceHpx = sliceHmm / scale;
-        const totalPages = Math.max(1, Math.ceil(canvas.height / sliceHpx));
+        const totalH = canvas.height;
+        const endH = Math.min(totalH, rowBottoms.length ? rowBottoms[rowBottoms.length - 1] : totalH);
+        const slices = [];
+        let cursor = 0;
+        let first = true;
+        while (cursor < endH) {
+            const effectiveTarget = cursor + (first ? pageHpx : pageHpx - headerHpx);
+            let cand = -1;
+            for (let i = 0; i < rowBottoms.length; i++) {
+                if (rowBottoms[i] > cursor && rowBottoms[i] <= effectiveTarget) {
+                    cand = rowBottoms[i];
+                } else if (rowBottoms[i] > effectiveTarget) {
+                    break;
+                }
+            }
+            if (cand <= cursor) {
+                for (let i = 0; i < rowBottoms.length; i++) {
+                    if (rowBottoms[i] > cursor) { cand = rowBottoms[i]; break; }
+                }
+                if (cand <= cursor || cand > endH) cand = endH;
+            }
+            if (cand > endH) cand = endH;
+            const sh = cand - cursor;
+            const hasRows = rowTops.some(t => t >= cursor && t < cand);
+            slices.push({ sy: cursor, sh, hasRows });
+            cursor = cand;
+            first = false;
+            if (cand >= endH) break;
+        }
+        if (!slices.length) slices.push({ sy: 0, sh: endH, hasRows: true });
 
-        for (let p = 0; p < totalPages; p++) {
+        for (let p = 0; p < slices.length; p++) {
             if (p > 0) pdf.addPage();
-            const sy = Math.round(p * sliceHpx);
-            const sh = Math.min(Math.round(sliceHpx), canvas.height - sy);
-            const slice = document.createElement('canvas');
-            slice.width = canvas.width;
-            slice.height = sh;
-            const ctx = slice.getContext('2d');
-            ctx.drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
-            const imgData = slice.toDataURL('image/jpeg', 0.95);
-            const imgHmm = sh * scale;
-            pdf.addImage(imgData, 'JPEG', margin, margin, pageW - 2 * margin, imgHmm);
+            const { sy, sh, hasRows } = slices[p];
+            const repeatHeader = p > 0 && hasRows && headerHpx > 0;
+            const imgH = repeatHeader ? sh + headerHpx : sh;
+            const pageImg = document.createElement('canvas');
+            pageImg.width = canvas.width;
+            pageImg.height = imgH;
+            const ctx = pageImg.getContext('2d');
+            if (repeatHeader) {
+                ctx.drawImage(canvas, 0, headerTopPx, canvas.width, headerHpx, 0, 0, canvas.width, headerHpx);
+                ctx.drawImage(canvas, 0, sy, canvas.width, sh, 0, headerHpx, canvas.width, sh);
+            } else {
+                ctx.drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
+            }
+            const imgHmm = imgH * mmPerPx;
+            pdf.addImage(pageImg.toDataURL('image/jpeg', 0.95), 'JPEG', margin, margin, contentW, imgHmm);
+            pdf.setDrawColor(28, 46, 74);
+            pdf.setLineWidth(0.5);
+            pdf.rect(margin, margin, contentW, contentH);
             pdf.setFontSize(8);
             pdf.setTextColor(120);
-            pdf.text(`Page ${p + 1} of ${totalPages}`, pageW / 2, pageH - 4, { align: 'center' });
+            pdf.text(`Page ${p + 1} of ${slices.length}`, pageW / 2, pageH - 5, { align: 'center' });
         }
         pdf.save('ADSWD_Report.pdf');
     } catch (err) {

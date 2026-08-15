@@ -137,10 +137,11 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 .stat-card p{font-size:13px;color:var(--text-light);margin-top:4px}
 
 /* TABLES */
-.table-wrapper{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow-md);border:1px solid var(--border);overflow:hidden}
+.table-wrapper{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow-md);border:1px solid var(--border);overflow-x:auto}
 .table-wrapper h3{padding:16px 20px;border-bottom:1px solid var(--border);font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
 .table-wrapper table{width:100%;border-collapse:collapse}
 .records-table{table-layout:fixed}
+.records-table th{white-space:nowrap}
 .records-table th,
 .records-table td{word-break:break-word;overflow-wrap:anywhere}
 .records-table td.amount{white-space:nowrap}
@@ -260,7 +261,7 @@ tr:hover{background:rgba(13,148,136,.03)}
 @media print{
     @page{
         size: A4 landscape;
-        margin: 12.7mm;
+        margin: 15mm;
     }
     body{
         overflow:visible!important;
