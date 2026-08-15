@@ -23,7 +23,9 @@ export function createBackup() {
 }
 
 export async function restoreBackup(e) {
-    const file = e.target.files[0]; if (!file) return;
+    const input = (e && e.target && e.target.files) ? e.target : e;
+    const file = input && input.files ? input.files[0] : null;
+    if (!file) return;
     const reader = new FileReader();
     reader.onload = async ev => {
         try {

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SW-FRMS | ADSWD</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;600;700&family=Noto+Serif:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
@@ -185,6 +185,12 @@ Create Account
 <button class="btn btn-primary" data-action="navigateTo" data-arg="cashbook" style="background:#0d9488;padding:12px 20px;font-size:14px">+ <span data-i18n="nav_cashbook">Cash Book Entry</span></button>
 </div>
 
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+<span style="font-size:12px;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:1px">Filter</span>
+<select id="dashMonth" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-size:13px"></select>
+<select id="dashYear" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-size:13px"></select>
+</div>
+
 <div class="stats-grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
 <div class="stat-card">
 <div class="stat-card-header">
@@ -314,9 +320,8 @@ Create Account
 </div>
 </div>
 <div class="cashbook-actions">
-<button class="btn btn-success" data-action="saveCashBook" data-i18n="save">SAVE</button>
-<button class="btn btn-accent" data-action="submitCashBook" data-i18n="submit">SUBMIT</button>
-<button class="btn btn-outline" data-action="resetCashBook" data-i18n="cancel">CANCEL</button>
+<button type="button" class="btn btn-success" data-action="saveCashBook" data-i18n="save">SAVE</button>
+<button type="button" class="btn btn-outline" data-action="resetCashBook" data-i18n="cancel">CANCEL</button>
 </div>
 </div>
 
@@ -345,7 +350,8 @@ Create Account
 <div style="flex:1"></div>
 <span id="recordCount" style="font-size:12px;color:var(--text-light)"></span>
 </div>
-<table>
+<table class="records-table">
+<colgroup><col style="width:9%"><col style="width:8%"><col style="width:11%"><col style="width:17%"><col style="width:17%"><col style="width:10%"><col style="width:10%"><col style="width:11%"><col style="width:7%"></colgroup>
 <thead>
 <tr>
 <th data-i18n="date">Date</th>
@@ -353,6 +359,8 @@ Create Account
 <th data-i18n="receipt_no">Receipt No.</th>
 <th data-i18n="particulars">Particulars</th>
 <th data-i18n="beneficiary">Particulars</th>
+<th data-i18n="token_no">Token No.</th>
+<th data-i18n="utr_no">UTR No.</th>
 <th data-i18n="net_pay">Net Pay</th>
 <th data-i18n="deduction">Deduction</th>
 <th data-i18n="gross_amount">Gross Amount</th>
@@ -417,40 +425,20 @@ Create Account
 </div>
 </div>
 <div class="report-body">
-<div class="report-section receipts-body">
 <table>
+<colgroup><col style="width:6%"><col style="width:7%"><col style="width:16%"><col style="width:8%"><col style="width:7%"><col style="width:6%"><col style="width:5%"><col style="width:5%"><col style="width:10%"><col style="width:4%"><col style="width:4%"><col style="width:5%"><col style="width:5%"><col style="width:6%"><col style="width:6%"></colgroup>
 <thead>
 <tr>
-<th data-i18n="date">Date</th>
-<th data-i18n="receipt_no">Receipt No.</th>
-<th data-i18n="particulars">Particulars</th>
-<th data-i18n="net_pay">Net Pay</th>
-<th data-i18n="deduction">Deduction</th>
-<th data-i18n="gross_amount">Gross Amount</th>
-<th>Total</th>
+<th colspan="6" class="sec-title col-last-r">RECEIPTS / <span class="kannada-text">ಸ್ವೀಕೃತಿಗಳು</span></th>
+<th colspan="9" class="sec-title col-first-p">PAYMENTS / <span class="kannada-text">ಸಂದಾಯಗಳು</span></th>
 </tr>
-</thead>
-<tbody id="rptReceiptBody"></tbody>
-</table>
-</div>
-<div class="report-section payments">
-<table>
-<thead>
 <tr>
-<th data-i18n="date">Date</th>
-<th data-i18n="receipt_no">Rcpt No.</th>
-<th data-i18n="beneficiary">Particulars</th>
-<th data-i18n="token_no">Token No.</th>
-<th data-i18n="utr_no">UTR No.</th>
-<th data-i18n="payment_date">Pay Date</th>
-<th data-i18n="net_pay">Net Pay</th>
-<th data-i18n="deduction">Ded.</th>
-<th data-i18n="gross_amount">Gross</th>
+<th>Date</th><th>Receipt No.</th><th>Particulars</th><th>Net Pay</th><th>Deduction</th><th class="col-last-r">Gross Amount</th>
+<th class="col-first-p">Date</th><th>Receipt No.</th><th>Particulars</th><th>Token No.</th><th>UTR No.</th><th>Payment Date</th><th>Net Pay</th><th>Deduction</th><th>Gross Amount</th>
 </tr>
 </thead>
-<tbody id="rptPaymentBody"></tbody>
+<tbody id="reportBody"></tbody>
 </table>
-</div>
 </div>
 <div class="report-footer">
 <span style="display:flex;align-items:center;gap:6px" data-i18n="prepared_by">Prepared by: <input type="text" id="reportPreparedBy" placeholder="Enter name" style="border:none;border-bottom:1px solid var(--text-light);background:transparent;color:var(--text);font-size:12px;width:160px;padding:0 4px;outline:none"></span>
@@ -711,7 +699,7 @@ Create Account
 </div>
 </div>
 
-<script type="module" src="js/main.js"></script>
+<script type="module" src="js/main.js?v=20260814"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>

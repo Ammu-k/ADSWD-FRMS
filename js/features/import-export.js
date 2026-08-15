@@ -15,9 +15,14 @@ export function setupDragDrop() {
     zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); handleImportFile(e.dataTransfer.files[0]); });
 }
 
-export function handleImport(e) { handleImportFile(e.target.files[0]); }
+export function handleImport(e) {
+    const input = (e && e.target && e.target.files) ? e.target : e;
+    const file = input && input.files ? input.files[0] : null;
+    if (!file) return;
+    handleImportFile(file);
+}
 
-export function handleImportFile(file) {
+export async function handleImportFile(file) {
     if (!file) return;
     const ext = file.name.split('.').pop().toLowerCase();
     if (!['xlsx', 'xls', 'csv'].includes(ext)) { toast(t('unsupported_file_format'), 'error'); return; }
@@ -38,7 +43,16 @@ export function handleImportFile(file) {
         };
         reader.readAsText(file);
     } else {
-        toast(t('save_as_csv_first'), 'info');
+        try {
+            const buf = await file.arrayBuffer();
+            const workbook = XLSX.read(new Uint8Array(buf), { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: '' });
+            if (!json || !json.length) { toast(t('no_records_found'), 'error'); return; }
+            showImportPreview(json);
+        } catch (err) {
+            toast(t('unsupported_file_format'), 'error');
+        }
     }
 }
 
@@ -76,7 +90,7 @@ export async function confirmImport() {
             const isDuplicate = state.records.some(r => r.date === date && r.receiptNo === receiptNo && r.particulars === particulars && r.type === 'receipt');
             if (isDuplicate) { duplicates++; continue; }
 
-            const type = beneficiary || row.type === 'payment' ? 'payment' : 'receipt';
+            const type = row.type === 'payment' ? 'payment' : 'receipt';
             await addRecordToFirestore({ type, date, receiptNo, particulars, netPay, deduction, grossAmount, beneficiary });
             imported++;
         }

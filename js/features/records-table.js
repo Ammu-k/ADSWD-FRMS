@@ -46,6 +46,8 @@ export function filterRecords() {
 <td>${esc(r.receiptNo || '-')}</td>
 <td>${esc(r.particulars || '-')}</td>
 <td>${esc(r.beneficiary || '-')}</td>
+<td>${esc(r.tokenNo || '-')}</td>
+<td>${esc(r.utrNo || '-')}</td>
 <td class="amount">₹${parseFloat(r.netPay || 0).toLocaleString('en-IN')}</td>
 <td class="amount">₹${parseFloat(r.deduction || 0).toLocaleString('en-IN')}</td>
 <td class="amount">₹${parseFloat(r.grossAmount || 0).toLocaleString('en-IN')}</td>
@@ -57,7 +59,7 @@ export function filterRecords() {
 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
 </button>
 </td>
-</tr>`).join('') : `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-light)">${t('no_records_found')}</td></tr>`;
+</tr>`).join('') : `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text-light)">${t('no_records_found')}</td></tr>`;
 }
 
 export function sortRecords(col) {

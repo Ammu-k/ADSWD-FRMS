@@ -140,6 +140,11 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 .table-wrapper{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow-md);border:1px solid var(--border);overflow:hidden}
 .table-wrapper h3{padding:16px 20px;border-bottom:1px solid var(--border);font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
 .table-wrapper table{width:100%;border-collapse:collapse}
+.records-table{table-layout:fixed}
+.records-table th,
+.records-table td{word-break:break-word;overflow-wrap:anywhere}
+.records-table td.amount{white-space:nowrap}
+.records-table td:last-child{white-space:nowrap;text-align:center}
 th{background:var(--primary);color:#fff;padding:12px 14px;font-size:12px;font-weight:600;text-align:left;white-space:nowrap;letter-spacing:.3px}
 td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)}
 tr:hover{background:rgba(13,148,136,.03)}
@@ -181,13 +186,19 @@ tr:hover{background:rgba(13,148,136,.03)}
 .report-totals .total-section.payments-tot{background:rgba(37,99,235,.1)}
 .report-totals .total-row{display:flex;justify-content:space-between;padding:4px 0}
 .report-totals .total-row.grand{font-weight:700;border-top:1px solid var(--border);margin-top:4px;padding-top:8px}
-.report-body{display:grid;grid-template-columns:1fr 1fr;gap:0}
-.report-body .report-section{overflow-x:auto}
-.report-body .report-section.receipts-body{border-right:2px solid var(--primary)}
-.report-body table{width:100%;border-collapse:collapse;font-size:12px}
+.report-body{overflow-x:auto}
+.report-body table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;margin:0}
 .report-body th{background:#1e293b;color:#f1f5f9;padding:8px;font-size:11px;font-weight:600;border:1px solid var(--border)}
+.report-body th.sec-title{background:rgba(255,255,255,.06);color:var(--text);font-size:12px;font-weight:700;text-align:center;padding:8px;border:1px solid var(--border)}
 .report-body td{padding:6px 8px;border:1px solid var(--border);font-size:12px;min-width:60px}
+.report-body th,
+.report-body td{white-space:normal;word-break:break-word;overflow-wrap:anywhere}
 .report-body tr:nth-child(even) td{background:rgba(255,255,255,.03)}
+.report-body .amount{white-space:nowrap}
+.report-body th.col-last-r,
+.report-body td.col-last-r{border-right:2px solid var(--primary) !important}
+.report-body th.col-first-p,
+.report-body td.col-first-p{border-left:2px solid var(--primary) !important}
 .report-footer{padding:12px 20px;border-top:2px solid var(--primary);display:flex;justify-content:space-between;font-size:12px;color:var(--text-light)}
 
 /* MODAL */
@@ -366,8 +377,6 @@ tr:hover{background:rgba(13,148,136,.03)}
 .sidebar.mobile-open{transform:translateX(0)}
 .cashbook-field{grid-template-columns:120px 1fr}
 .cashbook-field-label{font-size:12px;padding:10px 12px}
-.report-body{grid-template-columns:1fr}
-.report-body .report-section.receipts-body{border-right:none;border-bottom:2px solid var(--primary)}
 .stats-grid{grid-template-columns:1fr 1fr}
 .backup-options{grid-template-columns:1fr}
 .settings-grid{grid-template-columns:1fr}

@@ -4,27 +4,50 @@ import { t } from "./i18n.js";
 import { state } from "../services/app-state.js";
 import { api } from "../services/registry.js";
 
-export function updateDashboard() {
-    document.getElementById('statTotal').textContent = state.records.length;
-
+function populateSelectors() {
     const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
+    const months = [
+        t('jan'), t('feb'), t('mar'), t('apr'),
+        t('may'), t('jun'), t('jul'), t('aug'),
+        t('sep'), t('oct'), t('nov'), t('dec')
+    ];
+    const monthEl = document.getElementById('dashMonth');
+    const yearEl = document.getElementById('dashYear');
+    if (monthEl && !monthEl.options.length) {
+        monthEl.innerHTML = months.map((m, i) => `<option value="${i}">${m}</option>`).join('');
+        monthEl.value = now.getMonth();
+    }
+    if (yearEl && !yearEl.options.length) {
+        const years = [now.getFullYear() - 1, now.getFullYear(), now.getFullYear() + 1];
+        yearEl.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+        yearEl.value = now.getFullYear();
+    }
+}
+
+export function updateDashboard() {
+    populateSelectors();
+
+    const monthEl = document.getElementById('dashMonth');
+    const yearEl = document.getElementById('dashYear');
+    const selectedMonth = monthEl ? parseInt(monthEl.value) : new Date().getMonth();
+    const selectedYear = yearEl ? parseInt(yearEl.value) : new Date().getFullYear();
+
+    const receipts = state.records.filter(r => r.type === 'receipt' && r.date);
+    document.getElementById('statTotal').textContent = state.records.length;
+    document.getElementById('statStaffCount').textContent = receipts.length;
 
     let monthTotal = 0, yearTotal = 0;
-    state.records.forEach(r => {
-        if (!r.date) return;
+    receipts.forEach(r => {
         const d = new Date(r.date);
         const amt = parseFloat(r.grossAmount) || 0;
-        if (d.getFullYear() === currentYear) {
+        if (d.getFullYear() === selectedYear) {
             yearTotal += amt;
-            if (d.getMonth() === currentMonth) monthTotal += amt;
+            if (d.getMonth() === selectedMonth) monthTotal += amt;
         }
     });
 
     document.getElementById('statMonthTotal').textContent = '₹' + monthTotal.toLocaleString('en-IN');
     document.getElementById('statYearTotal').textContent = '₹' + yearTotal.toLocaleString('en-IN');
-    document.getElementById('statStaffCount').textContent = state.records.length;
 
     const months = [
         t('jan'), t('feb'), t('mar'), t('apr'),
@@ -32,11 +55,10 @@ export function updateDashboard() {
         t('sep'), t('oct'), t('nov'), t('dec')
     ];
     const monthlyData = new Array(12).fill(0);
-    state.records.forEach(r => {
-        if (!r.date) return;
+    receipts.forEach(r => {
         const d = new Date(r.date);
-        if (d.getFullYear() === currentYear) {
-            monthlyData[d.getMonth()] += parseFloat(r.grossAmount) || 0;
+        if (d.getFullYear() === selectedYear) {
+            monthlyData[d.getMonth()] += parseFloat(r.netPay) || 0;
         }
     });
     const maxVal = Math.max(...monthlyData, 1);
@@ -66,4 +88,12 @@ export function updateDashboard() {
   `;
 }
 
+export function onDashboardReady() {
+    const monthEl = document.getElementById('dashMonth');
+    const yearEl = document.getElementById('dashYear');
+    if (monthEl) monthEl.onchange = updateDashboard;
+    if (yearEl) yearEl.onchange = updateDashboard;
+}
+
 api.updateDashboard = updateDashboard;
+api.onDashboardReady = onDashboardReady;

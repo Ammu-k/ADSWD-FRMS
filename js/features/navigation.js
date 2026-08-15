@@ -10,7 +10,7 @@ export function navigateTo(page) {
     if (target) { target.classList.add('active'); }
     const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
     if (navItem) navItem.classList.add('active');
-    if (page === 'dashboard') api.updateDashboard?.();
+    if (page === 'dashboard') { api.onDashboardReady?.(); api.updateDashboard?.(); }
     if (page === 'records') api.filterRecords?.();
     if (page === 'reports') { api.populateReportSelectors?.(); api.generateReport?.(); }
     if (page === 'admin') {

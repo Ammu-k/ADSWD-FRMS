@@ -4,7 +4,7 @@
 // side-by-side detail tables. Shared by both the browser Print dialog and the
 // PDF export.
 
-import { esc, formatDate } from "../utils/format.js";
+import { esc, formatDate, pairReportRows } from "../utils/format.js";
 
 function money(n) {
     return '₹' + (parseFloat(n) || 0).toLocaleString('en-IN');
@@ -44,57 +44,79 @@ function buildSummaryBlock(records, type, title) {
     </div>`;
 }
 
-function buildReceiptsTable(records) {
-    const rs = records.filter(r => r.type === 'receipt');
-    const net = rs.reduce((s, r) => s + (parseFloat(r.netPay) || 0), 0);
-    const ded = rs.reduce((s, r) => s + (parseFloat(r.deduction) || 0), 0);
-    const gross = rs.reduce((s, r) => s + (parseFloat(r.grossAmount) || 0), 0);
-    const body = rs.length ? rs.map(r => `<tr>
-        <td>${esc(formatDate(r.date))}</td>
+const RECEIPT_COLS = 6;
+const PAYMENT_COLS = 9;
+const TOTAL_COLS = RECEIPT_COLS + PAYMENT_COLS;
+
+function receiptCells(r) {
+    return `<td>${esc(formatDate(r.date))}</td>
         <td>${esc(r.receiptNo || '-')}</td>
         <td>${esc(r.particulars || '-')}</td>
         <td class="num">${money(r.netPay)}</td>
         <td class="num">${money(r.deduction)}</td>
-        <td class="num">${money(r.grossAmount)}</td>
-    </tr>`).join('') : `<tr><td colspan="6" class="empty">No receipt records</td></tr>`;
-    return `<div>
-        <div class="sec-title">${RECEIPTS_TITLE}</div>
-        <table>
-            <colgroup><col style="width:11%"><col style="width:12%"><col style="width:42%"><col style="width:12%"><col style="width:11%"><col style="width:12%"></colgroup>
-            <thead><tr>
-                <th>Date</th><th>Receipt No.</th><th>Particulars</th>
-                <th>Net Pay</th><th>Deduction</th><th>Gross Amount</th>
-            </tr></thead>
-            <tbody>${body}
-            <tr class="total"><td colspan="3">TOTAL</td><td class="num">${money(net)}</td><td class="num">${money(ded)}</td><td class="num">${money(gross)}</td></tr>
-            </tbody>
-        </table>
-    </div>`;
+        <td class="num col-last-r">${money(r.grossAmount)}</td>`;
 }
 
-function buildPaymentsTable(records) {
-    const ps = records.filter(r => r.type === 'payment');
-    const net = ps.reduce((s, r) => s + (parseFloat(r.netPay) || 0), 0);
-    const ded = ps.reduce((s, r) => s + (parseFloat(r.deduction) || 0), 0);
-    const gross = ps.reduce((s, r) => s + (parseFloat(r.grossAmount) || 0), 0);
-    const body = ps.length ? ps.map(r => `<tr>
-        <td>${esc(formatDate(r.date))}</td>
+function paymentCells(r) {
+    return `<td class="col-first-p">${esc(formatDate(r.date))}</td>
         <td>${esc(r.receiptNo || '-')}</td>
         <td>${esc(r.beneficiary || r.particulars || '-')}</td>
+        <td>${esc(r.tokenNo || '-')}</td>
+        <td>${esc(r.utrNo || '-')}</td>
+        <td>${esc(formatDate(r.paymentDate || r.date))}</td>
         <td class="num">${money(r.netPay)}</td>
         <td class="num">${money(r.deduction)}</td>
-        <td class="num">${money(r.grossAmount)}</td>
-    </tr>`).join('') : `<tr><td colspan="6" class="empty">No payment records</td></tr>`;
+        <td class="num">${money(r.grossAmount)}</td>`;
+}
+
+function receiptEmptyCells() {
+    const cells = Array(RECEIPT_COLS).fill('<td>-</td>');
+    cells[RECEIPT_COLS - 1] = '<td class="col-last-r">-</td>';
+    return cells.join('');
+}
+
+function paymentEmptyCells() {
+    const cells = Array(PAYMENT_COLS).fill('<td>-</td>');
+    cells[0] = '<td class="col-first-p">-</td>';
+    return cells.join('');
+}
+
+function buildMergedTable(records) {
+    const rs = (records || []).filter(r => r.type === 'receipt');
+    const ps = (records || []).filter(r => r.type === 'payment');
+    const rNet = rs.reduce((s, r) => s + (parseFloat(r.netPay) || 0), 0);
+    const rDed = rs.reduce((s, r) => s + (parseFloat(r.deduction) || 0), 0);
+    const rGross = rs.reduce((s, r) => s + (parseFloat(r.grossAmount) || 0), 0);
+    const pNet = ps.reduce((s, r) => s + (parseFloat(r.netPay) || 0), 0);
+    const pDed = ps.reduce((s, r) => s + (parseFloat(r.deduction) || 0), 0);
+    const pGross = ps.reduce((s, r) => s + (parseFloat(r.grossAmount) || 0), 0);
+
+    const pairs = pairReportRows(records || []);
+    const body = pairs.length ? pairs.map(({ receipt, payment }) => `<tr>
+        ${receipt ? receiptCells(receipt) : receiptEmptyCells()}
+        ${payment ? paymentCells(payment) : paymentEmptyCells()}
+    </tr>`).join('') : `<tr><td colspan="${TOTAL_COLS}" class="empty">No records found</td></tr>`;
+
     return `<div>
-        <div class="sec-title">${PAYMENTS_TITLE}</div>
         <table>
-            <colgroup><col style="width:11%"><col style="width:12%"><col style="width:42%"><col style="width:12%"><col style="width:11%"><col style="width:12%"></colgroup>
-            <thead><tr>
-                <th>Date</th><th>Receipt No.</th><th>Particulars</th>
-                <th>Net Pay</th><th>Deduction</th><th>Gross Amount</th>
+            <colgroup><col style="width:6%"><col style="width:7%"><col style="width:16%"><col style="width:8%"><col style="width:7%"><col style="width:6%"><col style="width:5%"><col style="width:5%"><col style="width:10%"><col style="width:4%"><col style="width:4%"><col style="width:5%"><col style="width:5%"><col style="width:6%"><col style="width:6%"></colgroup>
+            <thead>
+            <tr>
+                <th colspan="${RECEIPT_COLS}" class="sec-title col-last-r">${RECEIPTS_TITLE}</th>
+                <th colspan="${PAYMENT_COLS}" class="sec-title col-first-p">${PAYMENTS_TITLE}</th>
+            </tr>
+            <tr>
+                <th>Date</th><th>Receipt No.</th><th>Particulars</th><th>Net Pay</th><th>Deduction</th><th class="col-last-r">Gross Amount</th>
+                <th class="col-first-p">Date</th><th>Receipt No.</th><th>Particulars</th><th>Token No.</th><th>UTR No.</th><th>Payment Date</th><th>Net Pay</th><th>Deduction</th><th>Gross Amount</th>
             </tr></thead>
             <tbody>${body}
-            <tr class="total"><td colspan="3">TOTAL</td><td class="num">${money(net)}</td><td class="num">${money(ded)}</td><td class="num">${money(gross)}</td></tr>
+            <tr class="total">
+                <td colspan="3">RECEIPTS TOTAL</td><td class="num">${money(rNet)}</td><td class="num">${money(rDed)}</td><td class="num col-last-r">${money(rGross)}</td>
+                <td colspan="6" class="col-first-p">PAYMENTS TOTAL</td><td class="num">${money(pNet)}</td><td class="num">${money(pDed)}</td><td class="num">${money(pGross)}</td>
+            </tr>
+            <tr class="total">
+                <td colspan="${TOTAL_COLS}">GRAND TOTAL &nbsp;·&nbsp; Net ${money(rNet + pNet)} &nbsp;·&nbsp; Deduction ${money(rDed + pDed)} &nbsp;·&nbsp; Gross ${money(rGross + pGross)}</td>
+            </tr>
             </tbody>
         </table>
     </div>`;
@@ -147,15 +169,20 @@ body {
 .summary { display: flex; gap: 4mm; width: 100%; margin-top: 3mm; }
 .summary > div { flex: 1 1 calc(50% - 2mm); width: calc(50% - 2mm); min-width: 0; }
 .sm-title { font-size: 9.5px; font-weight: 800; text-align: center; background: #eef2f7; border: 0.5px solid #1c2e4a; border-bottom: none; padding: 2px 3px; }
-.tables { display: flex; gap: 4mm; width: 100%; margin-top: 3mm; }
-.tables > div { flex: 1 1 calc(50% - 2mm); width: calc(50% - 2mm); min-width: 0; }
 .sec-title { font-size: 9.5px; font-weight: 800; text-align: center; background: #eef2f7; border: 0.5px solid #1c2e4a; border-bottom: none; padding: 2px 3px; }
+.merged-table { width: 100%; margin-top: 3mm; }
 .sheet table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .sheet th, .sheet td { border: 0.5px solid #1c2e4a; padding: 2.5px 3px; font-size: 8.5px; vertical-align: top; text-align: left; white-space: normal; word-break: break-word; letter-spacing: normal; overflow-wrap: anywhere; color: #111827; }
 .sheet th { background: #eef2f7; font-weight: 700; text-align: center; color: #111827; }
 .sheet td.num { text-align: right; white-space: nowrap; }
+.sheet td.tc { text-align: center; white-space: nowrap; }
+.sheet th.col-last-r, .sheet td.col-last-r { border-right: 2px solid #1c2e4a !important; }
+.sheet th.col-first-p, .sheet td.col-first-p { border-left: 2px solid #1c2e4a !important; }
 tr.total td { font-weight: 800; background: #f6f8fb; border-top: 1.5px solid #1c2e4a; }
 td.empty { text-align: center; color: #6b7280; padding: 8px 4px; }
+.tbadge { display: inline-block; padding: 1px 5px; border-radius: 8px; font-size: 7.5px; font-weight: 700; }
+.tbadge-success { background: #d1fae5; color: #065f46; }
+.tbadge-danger { background: #fee2e2; color: #991b1b; }
 .sm td { font-weight: 600; }
 .sm tr.grand td { font-weight: 800; background: #f6f8fb; border-top: 1.5px solid #1c2e4a; }
 .totals { display: flex; gap: 10px; margin-top: 3mm; }
@@ -171,11 +198,9 @@ function buildSheetHTML(data, logo) {
     const period = data.period || '';
     const metaLine = data.finYear ? `${period} &nbsp;·&nbsp; FY ${esc(data.finYear)}` : period;
     const logoImg = logo ? `<img class="emblem" src="${logo}" alt="Karnataka Emblem">` : '';
-    const head = buildReceiptsTable(data.records);
-    const pay = buildPaymentsTable(data.records);
+    const merged = buildMergedTable(data.records);
     const sumR = buildSummaryBlock(data.records, 'receipt', RECEIPTS_TITLE);
     const sumP = buildSummaryBlock(data.records, 'payment', PAYMENTS_TITLE);
-
     return `<div class="sheet">
     ${logo ? '<div class="watermark"></div>' : ''}
     <div class="letterhead">
@@ -193,9 +218,8 @@ function buildSheetHTML(data, logo) {
         ${sumR}
         ${sumP}
     </div>
-    <div class="tables">
-        ${head}
-        ${pay}
+    <div class="merged-table">
+        ${merged}
     </div>
     <div class="sign">
         <div>Prepared By</div>
@@ -220,6 +244,19 @@ ${buildReportCSS(logo)}
 </head>
 <body>
 ${buildSheetHTML(data, logo)}
+<script>
+(function(){
+  function printNow(){window.print();}
+  function run(){
+    if(document.fonts&&document.fonts.ready){
+      document.fonts.ready.then(printNow)['catch'](printNow);
+      setTimeout(printNow,600);
+    }else{printNow();}
+  }
+  window.addEventListener('load',function(){setTimeout(run,50);});
+  setTimeout(run,500);
+})();
+</script>
 </body>
 </html>`;
 }
@@ -241,9 +278,6 @@ export async function openPrintWindow(data) {
     w.document.write(html);
     w.document.close();
     w.focus();
-    setTimeout(() => {
-        w.print();
-    }, 150);
     setTimeout(() => {
         try { w.close(); } catch (e) { /* ignore */ }
     }, 4000);

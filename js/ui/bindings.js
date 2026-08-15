@@ -26,7 +26,6 @@ const clickHandlers = {
     toggleSidebar: () => toggleSidebar(),
     cycleTheme: () => cycleTheme(),
     saveCashBook: () => cashbook.saveCashBook(),
-    submitCashBook: () => cashbook.submitCashBook(),
     resetCashBook: () => cashbook.resetCashBook(),
     saveEdit: () => recordsTable.saveEdit(),
     closeEditModal: () => recordsTable.closeEditModal(),
@@ -57,8 +56,8 @@ const changeHandlers = {
     setLanguage: (el) => setLanguage(el.value),
     filterRecords: () => recordsTable.filterRecords(),
     generateReport: () => reports.generateReport(),
-    handleImport: (e) => importExport.handleImport(e),
-    restoreBackup: (e) => backup.restoreBackup(e),
+    handleImport: (el, e) => importExport.handleImport(e || el),
+    restoreBackup: (el, e) => backup.restoreBackup(e || el),
 };
 
 const inputHandlers = {

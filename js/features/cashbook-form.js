@@ -4,6 +4,7 @@ import { t } from "./i18n.js";
 import { toast } from "../ui/toast.js";
 import { api } from "../services/registry.js";
 import { addRecordToFirestore, loadRecordsFromFirestore, handleFirestoreError } from "../services/records-service.js";
+import { genId } from "../utils/format.js";
 
 export function initMonthSelects() {
     const months = [
@@ -52,7 +53,14 @@ export function updateCashBookTotal() {
 
 export function updateCashBook() { calcReceiptGross(); calcPaymentGross(); }
 
+let saving = false;
+
 export async function saveCashBook() {
+    if (saving) return;
+    saving = true;
+    const saveBtn = document.querySelector('.cashbook-actions [data-action="saveCashBook"]');
+    if (saveBtn) saveBtn.disabled = true;
+
     const rcDate = document.getElementById('rcDate').value;
     const rcReceiptNo = document.getElementById('rcReceiptNo').value.trim();
     const rcParticulars = document.getElementById('rcParticulars').value.trim();
@@ -76,30 +84,34 @@ export async function saveCashBook() {
     if (!hasReceipt && !hasPayment) { toast(t('no_data_to_save'), 'error'); return; }
 
     try {
-        const savedRecords = [];
+        const entryId = genId();
+        let receiptCount = 0, paymentCount = 0;
         if (hasReceipt) {
-            const newRecord = await addRecordToFirestore({ date: rcDate, receiptNo: rcReceiptNo, particulars: rcParticulars, netPay: rcNetPay, deduction: rcDeduction, grossAmount: rcGrossAmount, type: 'receipt' });
-            savedRecords.push(newRecord);
+            await addRecordToFirestore({ entryId, date: rcDate, receiptNo: rcReceiptNo, particulars: rcParticulars, netPay: rcNetPay, deduction: rcDeduction, grossAmount: rcGrossAmount, type: 'receipt' });
+            receiptCount++;
         }
         if (hasPayment) {
-            const newRecord = await addRecordToFirestore({ date: pmDate, receiptNo: pmReceiptNo, particulars: pmBeneficiary, beneficiary: pmBeneficiary, tokenNo: pmTokenNo, utrNo: pmUtrNo, paymentDate: pmPayDate, netPay: pmNetPay, deduction: pmDeduction, grossAmount: pmGrossAmount, type: 'payment' });
-            savedRecords.push(newRecord);
+            await addRecordToFirestore({ entryId, date: pmDate, receiptNo: pmReceiptNo, particulars: pmBeneficiary, beneficiary: pmBeneficiary, tokenNo: pmTokenNo, utrNo: pmUtrNo, paymentDate: pmPayDate, netPay: pmNetPay, deduction: pmDeduction, grossAmount: pmGrossAmount, type: 'payment' });
+            paymentCount++;
         }
 
         await loadRecordsFromFirestore();
         api.filterRecords?.();
         api.updateDashboard?.();
         api.generateReport?.();
-        const count = savedRecords.length;
-        toast(`${t('saved')} ${count} ${t('records_saved')}`, 'success');
+        if (receiptCount && paymentCount) {
+            toast(`${t('saved')} ${receiptCount} ${t('receipt')} + ${paymentCount} ${t('payment')}`, 'success');
+        } else {
+            const count = receiptCount + paymentCount;
+            toast(`${t('saved')} ${count} ${t('records_saved')}`, 'success');
+        }
         resetCashBook();
     } catch (error) {
         await handleFirestoreError('saveCashBook', error);
+    } finally {
+        saving = false;
+        if (saveBtn) saveBtn.disabled = false;
     }
-}
-
-export function submitCashBook() {
-    saveCashBook();
 }
 
 export function resetCashBook() {

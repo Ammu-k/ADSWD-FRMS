@@ -23,10 +23,53 @@ export function saveRecordsToLocalStorage() {
     }
 }
 
+function recordFingerprint(r) {
+    return [
+        r.date || '',
+        r.type || '',
+        r.receiptNo || '',
+        r.particulars || r.beneficiary || '',
+        parseFloat(r.netPay) || 0,
+        parseFloat(r.grossAmount) || 0
+    ].join('|');
+}
+
+function dedupeRecords(records) {
+    const seen = new Set();
+    const unique = [];
+    const duplicates = [];
+    (records || []).forEach(r => {
+        const fp = recordFingerprint(r);
+        if (seen.has(fp)) {
+            duplicates.push(r);
+        } else {
+            seen.add(fp);
+            unique.push(r);
+        }
+    });
+    return { unique, duplicates, removed: duplicates.length };
+}
+
+function removeDuplicatesFromFirestore(duplicates) {
+    if (!duplicates.length) return;
+    Promise.allSettled(duplicates.map(d => {
+        if (!d.id) return Promise.resolve();
+        return deleteDoc(doc(db, "records", d.id));
+    })).then(results => {
+        const deleted = results.filter(r => r.status === 'fulfilled').length;
+        if (deleted > 0) console.log(`[Firestore] Removed ${deleted} duplicate record(s) from Firestore.`);
+    });
+}
+
 export function loadRecordsFromLocalStorage() {
     try {
         const stored = getJSON(KEYS.records, []);
-        state.records = Array.isArray(stored) ? stored : [];
+        const { unique, removed } = dedupeRecords(Array.isArray(stored) ? stored : []);
+        state.records = unique;
+        if (removed > 0) {
+            console.warn(`[Records] Removed ${removed} duplicate record(s) from local data.`);
+            saveRecordsToLocalStorage();
+        }
     } catch (error) {
         console.error('loadRecordsFromLocalStorage', error);
         state.records = [];
@@ -54,7 +97,12 @@ export async function loadRecordsFromFirestore() {
                 ...docSnap.data()
             });
         });
-        state.records = loadedRecords;
+        const { unique, duplicates, removed } = dedupeRecords(loadedRecords);
+        state.records = unique;
+        if (removed > 0) {
+            console.warn(`[Records] Removed ${removed} duplicate record(s) from loaded data.`);
+            removeDuplicatesFromFirestore(duplicates);
+        }
         if (typeof api.filterRecords === 'function') api.filterRecords();
         if (typeof api.updateDashboard === 'function') api.updateDashboard();
         if (typeof api.generateReport === 'function') api.generateReport();
@@ -62,6 +110,7 @@ export async function loadRecordsFromFirestore() {
     } catch (error) {
         console.error('[Firestore] loadRecordsFromFirestore error:', error.code || error, error.message || '');
         await handleFirestoreError('loadRecordsFromFirestore', error, { silent: true });
+        loadRecordsFromLocalStorage();
     }
 }
 
@@ -83,11 +132,10 @@ export async function addRecordToFirestore(payload) {
         console.log('[Firestore] Record created:', docRef.id);
         return syncedRecord;
     } catch (error) {
-        state.records = state.records.filter((item) => item.id !== tempId);
-        api.filterRecords?.();
         console.error('[Firestore] Add error -', error.code, error.message);
         await handleFirestoreError('addRecordToFirestore', error);
-        throw error;
+        saveRecordsToLocalStorage();
+        return localRecord;
     }
 }
 

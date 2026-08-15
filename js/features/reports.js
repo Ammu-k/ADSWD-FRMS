@@ -1,7 +1,7 @@
 // reports.js - Monthly/daily report generation, print, PDF and Excel export.
 
 import { t } from "./i18n.js";
-import { esc, formatDate } from "../utils/format.js";
+import { esc, formatDate, pairReportRows } from "../utils/format.js";
 import { toast } from "../ui/toast.js";
 import { KEYS, getJSON, setJSON } from "../services/storage-service.js";
 import { state } from "../services/app-state.js";
@@ -91,31 +91,18 @@ export function generateReport() {
     document.getElementById('rptPaymentDed').textContent = '₹' + pDed.toLocaleString('en-IN');
     document.getElementById('rptPaymentGrand').textContent = '₹' + pGross.toLocaleString('en-IN');
 
+    const money = (n) => '₹' + (parseFloat(n) || 0).toLocaleString('en-IN');
     const rcStyle = 'font-weight:700;background:var(--card);border-top:2px solid var(--border)';
+    const pairs = pairReportRows(filtered);
 
-    if (receipts.length) {
-        document.getElementById('rptReceiptBody').innerHTML = receipts.map(r => `<tr>
-  <td>${formatDate(r.date)}</td><td>${esc(r.receiptNo || '')}</td><td>${esc(r.particulars || '')}</td>
-  <td class="amount">${parseFloat(r.netPay || 0).toLocaleString('en-IN')}</td>
-  <td class="amount">${parseFloat(r.deduction || 0).toLocaleString('en-IN')}</td>
-  <td class="amount">${parseFloat(r.grossAmount || 0).toLocaleString('en-IN')}</td>
-  <td class="amount">${parseFloat(r.grossAmount || 0).toLocaleString('en-IN')}</td>
-  </tr>`).join('') + `<tr style="${rcStyle}"><td colspan="3">${t('total')}</td><td class="amount">${rNet.toLocaleString('en-IN')}</td><td class="amount">${rDed.toLocaleString('en-IN')}</td><td class="amount">${rGross.toLocaleString('en-IN')}</td><td class="amount">${rGross.toLocaleString('en-IN')}</td></tr>`;
+    if (pairs.length) {
+        document.getElementById('reportBody').innerHTML = pairs.map(({ receipt, payment }) => `<tr>
+            ${receipt ? `<td>${formatDate(receipt.date)}</td><td>${esc(receipt.receiptNo || '-')}</td><td>${esc(receipt.particulars || '-')}</td><td class="amount">${money(receipt.netPay)}</td><td class="amount">${money(receipt.deduction)}</td><td class="amount col-last-r">${money(receipt.grossAmount)}</td>` : '<td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="col-last-r">-</td>'}
+            ${payment ? `<td class="col-first-p">${formatDate(payment.date)}</td><td>${esc(payment.receiptNo || '-')}</td><td>${esc(payment.beneficiary || payment.particulars || '-')}</td><td>${esc(payment.tokenNo || '-')}</td><td>${esc(payment.utrNo || '-')}</td><td>${formatDate(payment.paymentDate || payment.date)}</td><td class="amount">${money(payment.netPay)}</td><td class="amount">${money(payment.deduction)}</td><td class="amount">${money(payment.grossAmount)}</td>` : '<td class="col-first-p">-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>'}
+        </tr>`).join('') + `
+<tr style="${rcStyle}"><td colspan="3">RECEIPTS TOTAL</td><td class="amount">${money(rNet)}</td><td class="amount">${money(rDed)}</td><td class="amount col-last-r">${money(rGross)}</td><td colspan="6" class="col-first-p">PAYMENTS TOTAL</td><td class="amount">${money(pNet)}</td><td class="amount">${money(pDed)}</td><td class="amount">${money(pGross)}</td></tr>`;
     } else {
-        document.getElementById('rptReceiptBody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-light)">${t('no_receipt_records')}</td></tr>`;
-    }
-
-    if (payments.length) {
-        document.getElementById('rptPaymentBody').innerHTML = payments.map(r => `<tr>
-    <td>${formatDate(r.date)}</td><td>${esc(r.receiptNo || '')}</td><td>${esc(r.beneficiary || r.particulars || '')}</td>
-    <td>${esc(r.tokenNo || '')}</td><td>${esc(r.utrNo || '')}</td>
-    <td>${formatDate(r.paymentDate || r.date)}</td>
-    <td class="amount">${parseFloat(r.netPay || 0).toLocaleString('en-IN')}</td>
-    <td class="amount">${parseFloat(r.deduction || 0).toLocaleString('en-IN')}</td>
-    <td class="amount">${parseFloat(r.grossAmount || 0).toLocaleString('en-IN')}</td>
-    </tr>`).join('') + `<tr style="${rcStyle}"><td colspan="6">${t('total')}</td><td class="amount">${pNet.toLocaleString('en-IN')}</td><td class="amount">${pDed.toLocaleString('en-IN')}</td><td class="amount">${pGross.toLocaleString('en-IN')}</td></tr>`;
-    } else {
-        document.getElementById('rptPaymentBody').innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-light)">${t('no_payment_records')}</td></tr>`;
+        document.getElementById('reportBody').innerHTML = `<tr><td colspan="15" style="text-align:center;padding:20px;color:var(--text-light)">${t('no_records_found')}</td></tr>`;
     }
 }
 
@@ -208,6 +195,11 @@ export async function exportReportPDF() {
         host.insertAdjacentHTML('beforeend', sheet);
         document.body.appendChild(host);
 
+        if (document.fonts && document.fonts.ready) {
+            await document.fonts.ready.catch(() => {});
+        }
+        await new Promise(res => setTimeout(res, 50));
+
         const el = host.querySelector('.sheet');
         const canvas = await html2canvas(el, {
             scale: 2,
@@ -217,7 +209,6 @@ export async function exportReportPDF() {
             scrollY: 0,
             width: el.scrollWidth,
             height: el.scrollHeight,
-            onclone: () => {},
             logging: false
         });
         host.remove();
@@ -270,8 +261,7 @@ export function exportReportExcel() {
             return d.getMonth() === month && d.getFullYear() === year;
         });
     }
-    const receipts = filtered.filter(r => r.type === "receipt");
-    const payments = filtered.filter(r => r.type === "payment");
+    const paired = pairReportRows(filtered);
     const rows = [];
     rows.push([
         t('receipts').toUpperCase(), "", "", "", "", "", "",
@@ -281,10 +271,9 @@ export function exportReportExcel() {
         t('date'), t('receipt_no'), t('particulars'), t('net_pay'), t('deduction'), t('gross_amount'), t('total'),
         t('date'), t('receipt_no'), t('particulars'), t('token_no'), t('utr_no'), t('net_pay'), t('gross_amount')
     ]);
-    const maxRows = Math.max(receipts.length, payments.length);
-    for (let i = 0; i < maxRows; i++) {
-        const r = receipts[i] || {};
-        const p = payments[i] || {};
+    paired.forEach(row => {
+        const r = row.receipt || {};
+        const p = row.payment || {};
         rows.push([
             r.date || "",
             r.receiptNo || "",
@@ -301,7 +290,7 @@ export function exportReportExcel() {
             p.netPay || "",
             p.grossAmount || ""
         ]);
-    }
+    });
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(rows);
     ws["!cols"] = [
