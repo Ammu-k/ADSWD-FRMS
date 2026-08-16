@@ -332,12 +332,12 @@ export function exportReportExcel() {
     const paired = pairReportRows(filtered);
     const rows = [];
     rows.push([
-        t('receipts').toUpperCase(), "", "", "", "", "", "",
-        t('payments').toUpperCase(), "", "", "", "", "", ""
+        t('receipts').toUpperCase(), "", "", "", "", "",
+        t('payments').toUpperCase(), "", "", "", "", "", "", ""
     ]);
     rows.push([
-        t('date'), t('receipt_no'), t('particulars'), t('net_pay'), t('deduction'), t('gross_amount'), t('total'),
-        t('date'), t('receipt_no'), t('particulars'), t('token_no'), t('utr_no'), t('net_pay'), t('gross_amount')
+        t('date'), t('receipt_no'), t('particulars'), t('net_pay'), t('deduction'), t('gross_amount'),
+        t('date'), t('receipt_no'), t('particulars'), t('token_no'), t('utr_no'), t('net_pay'), t('deduction'), t('gross_amount')
     ]);
     paired.forEach(row => {
         const r = row.receipt || {};
@@ -349,21 +349,21 @@ export function exportReportExcel() {
             r.netPay || "",
             r.deduction || "",
             r.grossAmount || "",
-            r.grossAmount || "",
             p.date || "",
             p.receiptNo || "",
             p.beneficiary || "",
             p.tokenNo || "",
             p.utrNo || "",
             p.netPay || "",
+            p.deduction || "",
             p.grossAmount || ""
         ]);
     });
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(rows);
     ws["!cols"] = [
-        { wch: 12 }, { wch: 18 }, { wch: 28 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 },
-        { wch: 12 }, { wch: 18 }, { wch: 28 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 14 }
+        { wch: 12 }, { wch: 18 }, { wch: 28 }, { wch: 12 }, { wch: 12 }, { wch: 14 },
+        { wch: 12 }, { wch: 18 }, { wch: 28 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 14 }
     ];
     XLSX.utils.book_append_sheet(wb, ws, "Cash Book");
     const filename = dayVal
